@@ -3,192 +3,134 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inscripción | Charly Cursos</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Login | Charly Cursos</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui;
+      background: #070a0f;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container-login {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,0.05);
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 999px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #60d6ff, #5a6bff);
+      color: white;
+    }
+
+    .switch {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+    }
+
+    hr {
+      margin: 20px 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+  </style>
 </head>
+
 <body>
 
-  <header class="topbar">
-    <div class="container topbar__inner">
-      <a class="brand" href="index.html" aria-label="Charly Cursos">
-        <span class="brand__mark">C</span>
-        <span class="brand__text">
-          <strong>CHARLY</strong>
-          <small>CURSOS</small>
-        </span>
-      </a>
+<div class="container-login">
 
-      <a class="btn btn--ghost" href="index.html">Volver</a>
-    </div>
-  </header>
+  <!-- LOGIN -->
+  <h2>Ingresar</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button onclick="login()">Ingresar al campus</button>
 
-  <main class="auth-page">
-    <section class="auth">
-      <div class="container auth__grid">
-        <div class="auth__content">
-          <p class="pill">Inscripción al curso</p>
+  <div class="switch">¿No tenés cuenta? Registrate abajo 👇</div>
 
-          <h1>
-            Empezá tu
-            <span class="accent">inscripción</span>
-          </h1>
+  <hr>
 
-          <p class="hero__subtitle">
-            Completá tus datos para crear tu cuenta y acceder al curso de Personal Trainer.
-          </p>
+  <!-- REGISTRO -->
+  <h2>Inscribirme</h2>
+  <input type="text" id="nombre" placeholder="Nombre completo">
+  <input type="text" id="whatsapp" placeholder="WhatsApp">
+  <input type="email" id="email_reg" placeholder="Email">
+  <input type="password" id="password_reg" placeholder="Contraseña">
+  <button onclick="register()">Crear cuenta</button>
 
-          <div class="auth__benefits">
-            <div class="trust-item">
-              <div class="trust-item__title">Acceso privado</div>
-              <div class="trust-item__desc">Cada alumno entra con su propia cuenta.</div>
-            </div>
+</div>
 
-            <div class="trust-item">
-              <div class="trust-item__title">Por etapas</div>
-              <div class="trust-item__desc">El curso se organiza de forma progresiva.</div>
-            </div>
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-            <div class="trust-item">
-              <div class="trust-item__title">100% online</div>
-              <div class="trust-item__desc">Disponible desde celular, tablet y PC.</div>
-            </div>
-          </div>
-        </div>
+<script>
+  const supabaseClient = supabase.createClient(
+    "https://yfdiejyrhaaziceyeiuc.supabase.co",
+    "sb_publishable_frXqVXDILy3hgUFvp341pA_qqZdcQ_d"
+  );
 
-        <div class="auth__panel">
-          <div class="auth-card">
-            <div class="auth-tabs">
-              <button class="auth-tab auth-tab--active" id="tab-login" type="button">Ingresar</button>
-              <button class="auth-tab" id="tab-register" type="button">Inscribirme</button>
-            </div>
+  async function register() {
+    const email = document.getElementById("email_reg").value;
+    const password = document.getElementById("password_reg").value;
 
-            <div class="auth-form auth-form--active" id="login-form">
-              <h2>Ingresar</h2>
-              <p class="auth-copy">Si ya tenés cuenta, entrá con tus datos.</p>
-
-              <form onsubmit="event.preventDefault(); login();">
-                <div class="field">
-                  <label for="login-email">Email</label>
-                  <input id="login-email" type="email" placeholder="tuemail@gmail.com" required>
-                </div>
-
-                <div class="field">
-                  <label for="login-password">Contraseña</label>
-                  <input id="login-password" type="password" placeholder="Tu contraseña" required>
-                </div>
-
-                <button class="btn btn--primary btn--full" type="submit">Ingresar al campus</button>
-              </form>
-            </div>
-
-            <div class="auth-form" id="register-form">
-              <h2>Formulario de inscripción</h2>
-              <p class="auth-copy">Completá tus datos para crear tu cuenta.</p>
-
-              <form onsubmit="event.preventDefault(); register();">
-                <div class="field">
-                  <label for="register-name">Nombre y apellido</label>
-                  <input id="register-name" type="text" placeholder="Tu nombre completo" required>
-                </div>
-
-                <div class="field">
-                  <label for="register-whatsapp">WhatsApp</label>
-                  <input id="register-whatsapp" type="text" placeholder="+54 9 11..." required>
-                </div>
-
-                <div class="field">
-                  <label for="register-email">Email</label>
-                  <input id="register-email" type="email" placeholder="tuemail@gmail.com" required>
-                </div>
-
-                <div class="field">
-                  <label for="register-password">Contraseña</label>
-                  <input id="register-password" type="password" placeholder="Creá una contraseña" required>
-                </div>
-
-                <button class="btn btn--primary btn--full" type="submit">Crear cuenta</button>
-              </form>
-            </div>
-
-            <div class="auth-note" id="auth-message">
-              <strong>Importante:</strong>
-              <span>Completá tus datos correctamente para avanzar con la inscripción.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    const supabaseClient = window.supabase.createClient(
-      "https://yfdiejyrhaaziceyeiuc.supabase.co",
-      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
-    );
-
-    const tabLogin = document.getElementById("tab-login");
-    const tabRegister = document.getElementById("tab-register");
-    const loginForm = document.getElementById("login-form");
-    const registerForm = document.getElementById("register-form");
-    const authMessage = document.getElementById("auth-message");
-
-    tabLogin.addEventListener("click", () => {
-      tabLogin.classList.add("auth-tab--active");
-      tabRegister.classList.remove("auth-tab--active");
-      loginForm.classList.add("auth-form--active");
-      registerForm.classList.remove("auth-form--active");
+    const { error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password
     });
 
-    tabRegister.addEventListener("click", () => {
-      tabRegister.classList.add("auth-tab--active");
-      tabLogin.classList.remove("auth-tab--active");
-      registerForm.classList.add("auth-form--active");
-      loginForm.classList.remove("auth-form--active");
+    if (error) {
+      alert("Error: " + error.message);
+    } else {
+      alert("Cuenta creada correctamente. Ahora podés iniciar sesión.");
+    }
+  }
+
+  async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
     });
 
-    async function register() {
-      const name = document.getElementById("register-name").value;
-      const whatsapp = document.getElementById("register-whatsapp").value;
-      const email = document.getElementById("register-email").value;
-      const password = document.getElementById("register-password").value;
-
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-            whatsapp: whatsapp
-          }
-        }
-      });
-
-      if (error) {
-        authMessage.innerHTML = "<strong>Error:</strong> <span>" + error.message + "</span>";
-      } else {
-        authMessage.innerHTML = "<strong>Listo:</strong> <span>Cuenta creada. Revisá tu email si Supabase te pide confirmación.</span>";
-      }
+    if (error) {
+      alert("Error: " + error.message);
+    } else {
+      window.location.href = "campus.html";
     }
-
-    async function login() {
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-
-      const { error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        authMessage.innerHTML = "<strong>Error:</strong> <span>" + error.message + "</span>";
-      } else {
-        authMessage.innerHTML = "<strong>Bienvenido:</strong> <span>Accediendo al campus...</span>";
-        window.location.href = "campus.html";
-      }
-    }
-  </script>
+  }
+</script>
 
 </body>
 </html>

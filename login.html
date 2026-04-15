@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Charly Cursos</title>
+</head>
+<body style="background:black; color:white; font-family:sans-serif; text-align:center; margin-top:100px;">
+
+  <h1>Login</h1>
+
+  <input id="email" type="email" placeholder="Email"><br><br>
+  <input id="password" type="password" placeholder="Contraseña"><br><br>
+
+  <button onclick="register()">Registrarse</button>
+  <button onclick="login()">Ingresar</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    const supabaseClient = supabase.createClient(
+      "https://yfdiejyrhaaziceyeiuc.supabase.co",
+      "PEGAR_KEY_ACA"
+    );
+
+    async function register() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { error } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) alert(error.message);
+      else alert("Registrado!");
+    }
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) alert(error.message);
+      else {
+        alert("Entraste!");
+        window.location.href = "campus.html";
+      }
+    }
+  </script>
+
+</body>
+</html>

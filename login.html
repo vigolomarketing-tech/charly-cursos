@@ -8,13 +8,15 @@
   <style>
     body {
       margin: 0;
-      font-family: system-ui;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: #070a0f;
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
     .container-login {
@@ -24,10 +26,24 @@
       padding: 24px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 16px 60px rgba(0,0,0,.45);
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 28px;
+      text-align: center;
     }
 
     h2 {
-      margin-bottom: 10px;
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    p {
+      color: rgba(255,255,255,0.7);
+      line-height: 1.5;
+      margin: 0 0 16px;
     }
 
     input {
@@ -37,6 +53,8 @@
       border-radius: 10px;
       border: none;
       outline: none;
+      box-sizing: border-box;
+      font-size: 15px;
     }
 
     button {
@@ -49,6 +67,11 @@
       cursor: pointer;
       background: linear-gradient(135deg, #60d6ff, #5a6bff);
       color: white;
+      font-size: 15px;
+    }
+
+    button:hover {
+      opacity: .95;
     }
 
     .switch {
@@ -56,81 +79,130 @@
       text-align: center;
       font-size: 14px;
       color: rgba(255,255,255,0.6);
-      cursor: pointer;
     }
 
     hr {
-      margin: 20px 0;
-      border: 1px solid rgba(255,255,255,0.1);
+      margin: 22px 0;
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .message {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container-login">
+  <div class="container-login">
+    <h1>Charly Cursos</h1>
 
-  <!-- LOGIN -->
-  <h2>Ingresar</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="login()">Ingresar al campus</button>
+    <h2>Ingresar</h2>
+    <p>Si ya tenés cuenta, entrá con tus datos.</p>
 
-  <div class="switch">¿No tenés cuenta? Registrate abajo 👇</div>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="login()">Ingresar al campus</button>
 
-  <hr>
+    <div class="switch">¿No tenés cuenta? Registrate abajo 👇</div>
 
-  <!-- REGISTRO -->
-  <h2>Inscribirme</h2>
-  <input type="text" id="nombre" placeholder="Nombre completo">
-  <input type="text" id="whatsapp" placeholder="WhatsApp">
-  <input type="email" id="email_reg" placeholder="Email">
-  <input type="password" id="password_reg" placeholder="Contraseña">
-  <button onclick="register()">Crear cuenta</button>
+    <hr>
 
-</div>
+    <h2>Inscribirme</h2>
+    <p>Completá tus datos para crear tu cuenta.</p>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <input type="text" id="nombre" placeholder="Nombre completo">
+    <input type="text" id="whatsapp" placeholder="WhatsApp">
+    <input type="email" id="email_reg" placeholder="Email">
+    <input type="password" id="password_reg" placeholder="Contraseña">
+    <button onclick="register()">Crear cuenta</button>
 
-<script>
-  const supabaseClient = supabase.createClient(
-    "https://yfdiejyrhaaziceyeiuc.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZGllanlyaGFhemljZXllaXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjc3OTcsImV4cCI6MjA5MTg0Mzc5N30.Rx3hOr-oMa1geUkpsLyxsRpQ1ilmJnEol7xTRwzgZAc"
-  );
+    <div class="message" id="messageBox"></div>
+  </div>
 
-  async function register() {
-    const email = document.getElementById("email_reg").value;
-    const password = document.getElementById("password_reg").value;
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const { error } = await supabaseClient.auth.signUp({
-      email: email,
-      password: password
-    });
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      "https://yfdiejyrhaaziceyeiuc.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZGllanlyaGFhemljZXllaXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjc3OTcsImV4cCI6MjA5MTg0Mzc5N30.Rx3hOr-oMa1geUkpsLyxsRpQ1ilmJnEol7xTRwzgZAc"
+    );
 
-    if (error) {
-      alert("Error: " + error.message);
-    } else {
-      alert("Cuenta creada correctamente. Ahora podés iniciar sesión.");
+    const messageBox = document.getElementById("messageBox");
+
+    function showMessage(text, isError = false) {
+      messageBox.style.display = "block";
+      messageBox.textContent = text;
+      messageBox.style.borderColor = isError
+        ? "rgba(255,80,80,.25)"
+        : "rgba(96,214,255,.25)";
+      messageBox.style.color = isError
+        ? "rgba(255,180,180,.95)"
+        : "rgba(255,255,255,.85)";
     }
-  }
 
-  async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    async function register() {
+      const nombre = document.getElementById("nombre").value.trim();
+      const whatsapp = document.getElementById("whatsapp").value.trim();
+      const email = document.getElementById("email_reg").value.trim();
+      const password = document.getElementById("password_reg").value;
 
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
+      if (!nombre || !whatsapp || !email || !password) {
+        showMessage("Completá todos los campos para crear la cuenta.", true);
+        return;
+      }
 
-    if (error) {
-      alert("Error: " + error.message);
-    } else {
-      window.location.href = "campus.html";
+      const { error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            nombre: nombre,
+            whatsapp: whatsapp
+          }
+        }
+      });
+
+      if (error) {
+        showMessage("Error: " + error.message, true);
+      } else {
+        showMessage("Cuenta creada correctamente. Ahora podés iniciar sesión.");
+      }
     }
-  }
-</script>
+
+    async function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        showMessage("Ingresá email y contraseña.", true);
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        showMessage("Error: " + error.message, true);
+      } else {
+        showMessage("Ingreso correcto. Entrando al campus...");
+        setTimeout(() => {
+          window.location.href = "campus.html";
+        }, 700);
+      }
+    }
+  </script>
 
 </body>
 </html>

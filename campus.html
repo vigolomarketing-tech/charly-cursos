@@ -345,6 +345,13 @@
       font-size:14px;
     }
 
+    #plan-name{
+      margin-top:8px;
+      color:#8be9ff;
+      font-size:15px;
+      font-weight:700;
+    }
+
     @media (max-width: 980px){
       .hero__grid{grid-template-columns:1fr}
       .stats{grid-template-columns:1fr}
@@ -379,15 +386,16 @@
             Bienvenido al
             <span class="accent">campus</span>
           </h1>
-          <p class="subtitle">
+          <p class="subtitle" id="plan-description">
             Acá vas a encontrar tus etapas, clases, materiales, evaluaciones y el avance completo del programa.
           </p>
           <div id="user-email"></div>
+          <div id="plan-name"></div>
 
           <div class="stats">
             <div class="stat">
-              <strong>6 etapas</strong>
-              <span>Recorrido completo del curso organizado de forma progresiva.</span>
+              <strong id="stat-access">Acceso activo</strong>
+              <span id="stat-access-text">Tu cuenta ya está habilitada para comenzar.</span>
             </div>
             <div class="stat">
               <strong>24/7</strong>
@@ -414,7 +422,7 @@
             </div>
           </div>
 
-          <div class="notice">
+          <div class="notice" id="notice-box">
             <strong>Estado:</strong> tenés habilitada la primera etapa.
             Las demás quedan listas para conectarlas con la lógica real del curso.
           </div>
@@ -425,109 +433,58 @@
     <section class="section">
       <div class="container">
         <div class="section__head">
-          <h2>Etapas del programa</h2>
-          <p>La etapa 1 queda activa para entrar al módulo. Las demás las dejamos maquetadas para conectarlas después.</p>
+          <h2>Tu acceso actual</h2>
+          <p id="modules-description">La etapa 1 queda activa para entrar al módulo. Las demás las dejamos maquetadas para conectarlas después.</p>
         </div>
 
         <div class="modules">
           <article class="module-card module-card--active">
-            <span class="module-badge">Etapa 1 activa</span>
-            <h3>Fundamentos</h3>
-            <p>Introducción al programa, base teórica y primeros contenidos del recorrido.</p>
+            <span class="module-badge" id="main-badge">Módulo principal</span>
+            <h3 id="main-title">Acceder al contenido</h3>
+            <p id="main-text">Entrá al contenido disponible según el plan que elegiste.</p>
 
-            <div class="module-meta">
+            <div class="module-meta" id="main-meta">
               <span>• Videos y materiales</span>
-              <span>• Evaluación inicial</span>
+              <span>• Actividades prácticas</span>
               <span>• Acceso disponible</span>
             </div>
 
             <div class="module-actions">
-              <a class="btn btn--primary" href="modulo.html">Entrar al módulo</a>
+              <a class="btn btn--primary" href="modulo.html" id="main-button">Entrar al módulo</a>
             </div>
           </article>
 
           <article class="module-card module-card--locked">
-            <span class="module-lock">Bloqueado</span>
-            <span class="module-badge">Etapa 2</span>
-            <h3>Técnica y ejecución</h3>
-            <p>Desarrollo técnico, criterios de ejecución y profundización de movimientos.</p>
+            <span class="module-lock">Próximamente</span>
+            <span class="module-badge">Más contenido</span>
+            <h3>Expansión del campus</h3>
+            <p>Después podemos conectar más módulos, evaluaciones, certificados y progreso real por plan.</p>
 
             <div class="module-meta">
-              <span>• Videos y materiales</span>
-              <span>• Actividades prácticas</span>
-              <span>• Se habilita después</span>
+              <span>• Evaluaciones</span>
+              <span>• Certificación</span>
+              <span>• Desbloqueos</span>
             </div>
 
             <div class="module-actions">
-              <button class="btn" type="button">Próximamente</button>
+              <button class="btn" type="button">En desarrollo</button>
             </div>
           </article>
 
           <article class="module-card module-card--locked">
-            <span class="module-lock">Bloqueado</span>
-            <span class="module-badge">Etapa 3</span>
-            <h3>Planificación</h3>
-            <p>Organización del entrenamiento, progresiones y estructura de trabajo.</p>
+            <span class="module-lock">Próximamente</span>
+            <span class="module-badge">Automatización</span>
+            <h3>Pagos y acceso real</h3>
+            <p>La próxima etapa es conectar pagos, acceso automático y contenido filtrado por cada plan.</p>
 
             <div class="module-meta">
-              <span>• Videos y PDFs</span>
-              <span>• Multiple choice</span>
-              <span>• Se habilita después</span>
+              <span>• MercadoPago</span>
+              <span>• Acceso por compra</span>
+              <span>• Planes dinámicos</span>
             </div>
 
             <div class="module-actions">
-              <button class="btn" type="button">Próximamente</button>
-            </div>
-          </article>
-
-          <article class="module-card module-card--locked">
-            <span class="module-lock">Bloqueado</span>
-            <span class="module-badge">Etapa 4</span>
-            <h3>Aplicación práctica</h3>
-            <p>Casos, criterios y aplicación progresiva de los contenidos vistos.</p>
-
-            <div class="module-meta">
-              <span>• Clases grabadas</span>
-              <span>• Trabajo práctico</span>
-              <span>• Se habilita después</span>
-            </div>
-
-            <div class="module-actions">
-              <button class="btn" type="button">Próximamente</button>
-            </div>
-          </article>
-
-          <article class="module-card module-card--locked">
-            <span class="module-lock">Bloqueado</span>
-            <span class="module-badge">Etapa 5</span>
-            <h3>Evaluaciones</h3>
-            <p>Instancia de validación de contenidos y consolidación del aprendizaje.</p>
-
-            <div class="module-meta">
-              <span>• Multiple choice</span>
-              <span>• Corrección manual</span>
-              <span>• Se habilita después</span>
-            </div>
-
-            <div class="module-actions">
-              <button class="btn" type="button">Próximamente</button>
-            </div>
-          </article>
-
-          <article class="module-card module-card--locked">
-            <span class="module-lock">Bloqueado</span>
-            <span class="module-badge">Etapa 6</span>
-            <h3>Cierre y certificación</h3>
-            <p>Etapa final del recorrido con cierre de cursada y certificación correspondiente.</p>
-
-            <div class="module-meta">
-              <span>• Evaluación final</span>
-              <span>• Cierre del programa</span>
-              <span>• Se habilita después</span>
-            </div>
-
-            <div class="module-actions">
-              <button class="btn" type="button">Próximamente</button>
+              <button class="btn" type="button">En desarrollo</button>
             </div>
           </article>
         </div>
@@ -542,6 +499,92 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZGllanlyaGFhemljZXllaXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjc3OTcsImV4cCI6MjA5MTg0Mzc5N30.Rx3hOr-oMa1geUkpsLyxsRpQ1ilmJnEol7xTRwzgZAc"
     );
 
+    function formatPlanName(plan) {
+      const names = {
+        completo: "Pack Completo",
+        personal: "Personal Trainer",
+        hiit: "Funcional & HIIT",
+        musculacion: "Musculación",
+        nutricion: "Nutrición deportiva"
+      };
+      return names[plan] || "Sin plan definido";
+    }
+
+    function applyPlanContent() {
+      const plan = localStorage.getItem("plan");
+
+      const planName = document.getElementById("plan-name");
+      const planDescription = document.getElementById("plan-description");
+      const statAccess = document.getElementById("stat-access");
+      const statAccessText = document.getElementById("stat-access-text");
+      const noticeBox = document.getElementById("notice-box");
+      const modulesDescription = document.getElementById("modules-description");
+      const mainBadge = document.getElementById("main-badge");
+      const mainTitle = document.getElementById("main-title");
+      const mainText = document.getElementById("main-text");
+
+      const formatted = formatPlanName(plan);
+      planName.innerText = "Plan seleccionado: " + formatted;
+
+      if (plan === "completo") {
+        planDescription.innerText = "Tenés acceso al pack completo con todas las formaciones disponibles dentro del campus.";
+        statAccess.innerText = "Acceso total";
+        statAccessText.innerText = "Tu cuenta tiene habilitadas todas las áreas de formación.";
+        noticeBox.innerHTML = "<strong>Estado:</strong> tenés acceso al pack completo. Después conectamos cada curso por separado dentro del campus.";
+        modulesDescription.innerText = "Como elegiste el pack completo, la idea es que desde acá puedas entrar a todas las formaciones.";
+        mainBadge.innerText = "Pack completo activo";
+        mainTitle.innerText = "Entrar al contenido completo";
+        mainText.innerText = "Accedé a Personal Trainer, Nutrición, Funcional & HIIT y Musculación desde un mismo campus.";
+      } else if (plan === "personal") {
+        planDescription.innerText = "Tenés acceso al curso de Personal Trainer.";
+        statAccess.innerText = "Acceso individual";
+        statAccessText.innerText = "Tu cuenta está habilitada para Personal Trainer.";
+        noticeBox.innerHTML = "<strong>Estado:</strong> tenés habilitado el curso de Personal Trainer.";
+        modulesDescription.innerText = "Tu acceso actual corresponde al curso de Personal Trainer.";
+        mainBadge.innerText = "Curso activo";
+        mainTitle.innerText = "Entrar a Personal Trainer";
+        mainText.innerText = "Accedé al contenido de Personal Trainer, sus clases, actividades y materiales.";
+      } else if (plan === "hiit") {
+        planDescription.innerText = "Tenés acceso al curso de Funcional & HIIT.";
+        statAccess.innerText = "Acceso individual";
+        statAccessText.innerText = "Tu cuenta está habilitada para Funcional & HIIT.";
+        noticeBox.innerHTML = "<strong>Estado:</strong> tenés habilitado el curso de Funcional & HIIT.";
+        modulesDescription.innerText = "Tu acceso actual corresponde al curso de Funcional & HIIT.";
+        mainBadge.innerText = "Curso activo";
+        mainTitle.innerText = "Entrar a Funcional & HIIT";
+        mainText.innerText = "Accedé al contenido de Funcional & HIIT, clases, rutinas y materiales.";
+      } else if (plan === "musculacion") {
+        planDescription.innerText = "Tenés acceso al curso de Musculación.";
+        statAccess.innerText = "Acceso individual";
+        statAccessText.innerText = "Tu cuenta está habilitada para Musculación.";
+        noticeBox.innerHTML = "<strong>Estado:</strong> tenés habilitado el curso de Musculación.";
+        modulesDescription.innerText = "Tu acceso actual corresponde al curso de Musculación.";
+        mainBadge.innerText = "Curso activo";
+        mainTitle.innerText = "Entrar a Musculación";
+        mainText.innerText = "Accedé al contenido de Musculación, técnica, rutinas y materiales.";
+      } else if (plan === "nutricion") {
+        planDescription.innerText = "Tenés acceso al curso de Nutrición deportiva.";
+        statAccess.innerText = "Acceso individual";
+        statAccessText.innerText = "Tu cuenta está habilitada para Nutrición deportiva.";
+        noticeBox.innerHTML = "<strong>Estado:</strong> tenés habilitado el curso de Nutrición deportiva.";
+        modulesDescription.innerText = "Tu acceso actual corresponde al curso de Nutrición deportiva.";
+        mainBadge.innerText = "Curso activo";
+        mainTitle.innerText = "Entrar a Nutrición deportiva";
+        mainText.innerText = "Accedé al contenido de Nutrición deportiva, materiales y actividades.";
+      } else {
+        planDescription.innerText = "Todavía no hay un plan definido. Volvé a la página de planes para seleccionar uno.";
+        statAccess.innerText = "Sin plan";
+        statAccessText.innerText = "Seleccioná primero una opción de acceso.";
+        noticeBox.innerHTML = "<strong>Estado:</strong> todavía no seleccionaste ningún plan.";
+        modulesDescription.innerText = "Para continuar, elegí un plan desde la página correspondiente.";
+        mainBadge.innerText = "Pendiente";
+        mainTitle.innerText = "Elegí un plan";
+        mainText.innerText = "Primero necesitás seleccionar una formación para continuar.";
+        document.getElementById("main-button").setAttribute("href", "planes.html");
+        document.getElementById("main-button").innerText = "Ir a planes";
+      }
+    }
+
     async function checkUser() {
       const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -549,11 +592,13 @@
         window.location.href = "login.html";
       } else {
         document.getElementById("user-email").innerText = "Sesión iniciada: " + session.user.email;
+        applyPlanContent();
       }
     }
 
     async function logout() {
       await supabaseClient.auth.signOut();
+      localStorage.removeItem("plan");
       window.location.href = "login.html";
     }
 

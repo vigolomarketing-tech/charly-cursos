@@ -1034,5 +1034,55 @@
       </div>
     </section>
   </main>
+
+  <script>
+    function aplicarFiltroPlan() {
+      const plan = localStorage.getItem("plan");
+
+      const secciones = {
+        personal: document.getElementById("personal-trainer"),
+        nutricion: document.getElementById("nutricion"),
+        hiit: document.getElementById("funcional-hiit"),
+        musculacion: document.getElementById("musculacion"),
+        completo: document.getElementById("pack-completo")
+      };
+
+      const navLinks = {
+        personal: document.querySelector('a[href="#personal-trainer"]'),
+        nutricion: document.querySelector('a[href="#nutricion"]'),
+        hiit: document.querySelector('a[href="#funcional-hiit"]'),
+        musculacion: document.querySelector('a[href="#musculacion"]'),
+        completo: document.querySelector('a[href="#pack-completo"]')
+      };
+
+      Object.values(secciones).forEach(sec => {
+        if (sec) sec.style.display = "none";
+      });
+
+      Object.values(navLinks).forEach(link => {
+        if (link) link.style.display = "none";
+      });
+
+      if (plan === "completo") {
+        Object.values(secciones).forEach(sec => {
+          if (sec) sec.style.display = "block";
+        });
+        Object.values(navLinks).forEach(link => {
+          if (link) link.style.display = "block";
+        });
+        return;
+      }
+
+      if (secciones[plan]) {
+        secciones[plan].style.display = "block";
+      }
+
+      if (navLinks[plan]) {
+        navLinks[plan].style.display = "block";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", aplicarFiltroPlan);
+  </script>
 </body>
 </html>

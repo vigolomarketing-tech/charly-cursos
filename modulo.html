@@ -1174,5 +1174,55 @@
 
     document.addEventListener("DOMContentLoaded", aplicarFiltroPlan);
   </script>
+  <script>
+  function aplicarBloqueoDemo() {
+    const progreso = JSON.parse(localStorage.getItem("progresoDemo")) || {
+      personal: 1,
+      nutricion: 1,
+      hiit: 1,
+      musculacion: 1
+    };
+
+    const cursos = [
+      { id: "personal-trainer", key: "personal" },
+      { id: "nutricion", key: "nutricion" },
+      { id: "funcional-hiit", key: "hiit" },
+      { id: "musculacion", key: "musculacion" }
+    ];
+
+    cursos.forEach(curso => {
+      const seccion = document.getElementById(curso.id);
+      if (!seccion) return;
+
+      const clases = seccion.querySelectorAll(".lesson");
+      const permitidas = progreso[curso.key] || 1;
+
+      clases.forEach((clase, index) => {
+        const numeroClase = index + 1;
+
+        if (numeroClase > permitidas) {
+          clase.style.opacity = "0.38";
+          clase.style.filter = "grayscale(1)";
+          clase.style.pointerEvents = "none";
+          clase.style.position = "relative";
+
+          const aviso = document.createElement("div");
+          aviso.innerHTML = "🔒 Clase bloqueada — se habilita al aprobar la etapa anterior";
+          aviso.style.marginTop = "12px";
+          aviso.style.padding = "12px";
+          aviso.style.borderRadius = "14px";
+          aviso.style.background = "rgba(255,255,255,.08)";
+          aviso.style.border = "1px solid rgba(255,255,255,.12)";
+          aviso.style.color = "rgba(255,255,255,.78)";
+          aviso.style.fontWeight = "700";
+
+          clase.appendChild(aviso);
+        }
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", aplicarBloqueoDemo);
+</script>
 </body>
 </html>

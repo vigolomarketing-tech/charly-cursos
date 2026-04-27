@@ -22,6 +22,22 @@
       padding: 20px;
     }
 
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .top-actions a {
+      color: white;
+      text-decoration: none;
+      background: #1e293b;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+    }
+
     h1 {
       margin-bottom: 10px;
     }
@@ -35,10 +51,12 @@
 
     input, select {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
+      box-sizing: border-box;
+      font-size: 15px;
     }
 
     button {
@@ -47,10 +65,11 @@
       width: 100%;
       background: #22c55e;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       color: black;
       font-weight: bold;
       cursor: pointer;
+      font-size: 15px;
     }
 
     button:hover {
@@ -58,7 +77,18 @@
     }
 
     .status {
-      margin-top: 10px;
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .user-box {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 14px;
+      color: rgba(255,255,255,.85);
       font-size: 14px;
     }
   </style>
@@ -67,20 +97,30 @@
 <body>
 
 <div class="container">
+  <div class="top-actions">
+    <a href="campus.html">← Volver al campus</a>
+    <a href="login.html">Login</a>
+  </div>
+
   <h1>📚 Campus del alumno</h1>
   <p>Subí tu trabajo final para que sea corregido.</p>
+
+  <div class="user-box" id="userBox">
+    Verificando sesión...
+  </div>
 
   <div class="card">
     <h2>📤 Entregar trabajo</h2>
 
-    <input type="text" id="nombre" placeholder="Tu nombre" />
+    <input type="text" id="nombre" placeholder="Tu nombre completo" />
 
     <select id="curso">
       <option value="">Seleccionar curso</option>
-      <option>Personal Trainer</option>
-      <option>Musculación</option>
-      <option>Funcional & HIIT</option>
-      <option>Nutrición</option>
+      <option value="Personal Trainer">Personal Trainer</option>
+      <option value="Musculación">Musculación</option>
+      <option value="Funcional & HIIT">Funcional & HIIT</option>
+      <option value="Nutrición">Nutrición</option>
+      <option value="Pack completo">Pack completo</option>
     </select>
 
     <input type="file" id="archivo" />
@@ -96,8 +136,22 @@
   const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
   const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+  async function verificarSesion() {
+    const userBox = document.getElementById("userBox");
+
+    const { data, error } = await supabase.auth.getUser();
+
+    if (error || !data.user) {
+      userBox.innerHTML = "⚠️ No hay sesión iniciada. Primero tenés que ingresar con tu cuenta.";
+      return null;
+    }
+
+    userBox.innerHTML = "✅ Sesión iniciada: <strong>" + data.user.email + "</strong>";
+    return data.user;
+  }
+
   async function subirTrabajo() {
-    const nombre = document.getElementById("nombre").value;
+    const nombre = document.getElementById("nombre").value.trim();
     const curso = document.getElementById("curso").value;
     const archivo = document.getElementById("archivo").files[0];
     const status = document.getElementById("status");
@@ -107,37 +161,40 @@
       return;
     }
 
-    status.innerText = "Subiendo archivo...";
+    const { data, error } = await supabase.auth.getUser();
 
-    const { data: userData } = await supabase.auth.getUser();
-    const email = userData?.user?.email;
-
-    if (!email) {
-      status.innerText = "❌ No estás logueado";
+    if (error || !data.user) {
+      status.innerText = "❌ No estás logueado. Iniciá sesión antes de subir el trabajo.";
       return;
     }
 
-    const fileName = `${Date.now()}-${archivo.name}`;
+    const email = data.user.email;
 
-    // SUBIR ARCHIVO
+    status.innerText = "Subiendo archivo...";
+
+    const nombreSeguro = archivo.name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    const fileName = `${Date.now()}-${nombreSeguro}`;
+
     const { error: uploadError } = await supabase.storage
       .from("entregas")
       .upload(fileName, archivo);
 
     if (uploadError) {
-      status.innerText = "❌ Error al subir archivo";
+      status.innerText = "❌ Error al subir archivo: " + uploadError.message;
       console.log(uploadError);
       return;
     }
 
-    // OBTENER URL
     const { data: publicUrlData } = supabase.storage
       .from("entregas")
       .getPublicUrl(fileName);
 
     const archivo_url = publicUrlData.publicUrl;
 
-    // GUARDAR EN BD
     const { error: dbError } = await supabase
       .from("entregas")
       .insert([
@@ -151,17 +208,19 @@
       ]);
 
     if (dbError) {
-      status.innerText = "❌ Error guardando en base de datos";
+      status.innerText = "❌ Error guardando en base de datos: " + dbError.message;
       console.log(dbError);
       return;
     }
 
-    status.innerText = "✅ Trabajo enviado correctamente";
+    status.innerText = "✅ Trabajo enviado correctamente. Queda pendiente de corrección.";
 
     document.getElementById("nombre").value = "";
     document.getElementById("curso").value = "";
     document.getElementById("archivo").value = "";
   }
+
+  verificarSesion();
 </script>
 
 </body>

@@ -86,8 +86,8 @@
     <a href="login.html">Login</a>
   </div>
 
-  <h1>📤 Entregar trabajo</h1>
-  <p>Subí tu trabajo final para corrección.</p>
+  <h1>📤 Entregar actividad / trabajo final</h1>
+  <p>Subí tu archivo para que el profesor lo revise y corrija.</p>
 
   <div class="user" id="userBox">Verificando sesión...</div>
 
@@ -106,7 +106,7 @@
 
     <input type="file" id="archivo">
 
-    <button onclick="subirTrabajo()">Subir trabajo</button>
+    <button onclick="subirTrabajo()">Enviar entrega</button>
 
     <div class="status" id="status"></div>
 
@@ -138,7 +138,7 @@ async function subirTrabajo(){
   const status = document.getElementById("status");
 
   if(!nombre || !curso || !archivo){
-    status.innerText = "⚠️ Completá todo";
+    status.innerText = "⚠️ Completá todos los campos";
     return;
   }
 
@@ -151,7 +151,7 @@ async function subirTrabajo(){
 
   const email = data.user.email;
 
-  status.innerText = "Subiendo...";
+  status.innerText = "Subiendo archivo...";
 
   const fileName = Date.now() + "-" + archivo.name;
 
@@ -184,12 +184,12 @@ async function subirTrabajo(){
     ]);
 
   if(dbError){
-    status.innerText = "❌ Error guardando";
+    status.innerText = "❌ Error guardando en base de datos";
     console.log(dbError);
     return;
   }
 
-  status.innerText = "✅ Trabajo enviado";
+  status.innerText = "✅ Entrega enviada correctamente";
 
   document.getElementById("nombre").value = "";
   document.getElementById("curso").value = "";

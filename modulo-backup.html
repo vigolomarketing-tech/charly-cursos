@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Módulos | Charly Cursos</title>
+
+  <style>
+    :root{
+      --bg:#070a0f;
+      --panel:rgba(255,255,255,.05);
+      --panel2:rgba(255,255,255,.03);
+      --stroke:rgba(255,255,255,.10);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.64);
+      --accent:#60d6ff;
+      --accent2:#5a6bff;
+      --shadow:0 16px 60px rgba(0,0,0,.45);
+      --container:1200px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 20% 0%, rgba(96,214,255,.14), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(90,107,255,.14), transparent 55%),
+        radial-gradient(900px 800px at 60% 100%, rgba(96,214,255,.10), transparent 60%),
+        var(--bg);
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{width:min(var(--container),92%);margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(7,10,15,.78);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .topbar__inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 0;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:180px;
+    }
+
+    .brand__mark{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      background:linear-gradient(135deg, rgba(96,214,255,.22), rgba(90,107,255,.18));
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .brand__text strong{
+      display:block;
+      line-height:1;
+      letter-spacing:.8px;
+    }
+
+    .brand__text small{
+      display:block;
+      color:rgba(255,255,255,.55);
+      letter-spacing:3px;
+      font-size:10px;
+      margin-top:4px;
+    }
+
+    .topbar__actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      padding:12px 16px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      letter-spacing:.2px;
+      cursor:pointer;
+    }
+
+    .btn--primary{
+      border-color:rgba(96,214,255,.25);
+      background:linear-gradient(135deg, rgba(96,214,255,.22), rgba(90,107,255,.18));
+    }
+
+    .btn--ghost{
+      background:transparent;
+    }
+
+    .hero{
+      padding:34px 0 18px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.72);
+      margin:0 0 14px;
+    }
+
+    h1{
+      margin:0 0 12px;
+      font-size:clamp(30px,4vw,48px);
+      line-height:1.05;
+      letter-spacing:-0.8px;
+    }
+
+    .accent{
+      background:linear-gradient(90deg, var(--accent), rgba(90,107,255,.9));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .subtitle{
+      margin:0;
+      color:rgba(255,255,255,.72);
+      font-size:16px;
+      line-height:1.6;
+      max-width:72ch;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:18px;
+      padding:12px 0 34px;
+    }
+
+    .sidebar{
+      position:sticky;
+      top:84px;
+      align-self:start;
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .sidebar h3{
+      margin:0 0 12px;
+      font-size:18px;
+    }
+
+    .nav-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .nav-link{
+      display:block;
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.82);
+      font-weight:700;
+    }
+
+    .nav-link:hover{
+      background:rgba(255,255,255,.07);
+    }
+
+    .content{
+      display:grid;
+      gap:18px;
+    }
+
+    .course{
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .course__top{
+      margin-bottom:18px;
+    }
+
+    .course__badge{
+      display:inline-flex;
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(96,214,255,.10);
+      border:1px solid rgba(96,214,255,.18);
+      color:rgba(255,255,255,.86);
+      font-weight:800;
+      font-size:12px;
+      margin-bottom:10px;
+    }
+
+    .course__title{
+      margin:0 0 8px;
+      font-size:28px;
+    }
+
+    .course__desc{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .lesson{
+      background:var(--panel2);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+      padding:16px;
+      margin-top:14px;
+    }
+
+    .lesson h3{
+      margin:0 0 8px;
+      font-size:22px;
+    }
+
+    .lesson p{
+      margin:0 0 12px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .video-wrap{
+      overflow:hidden;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      margin:12px 0 14px;
+      background:#000;
+    }
+
+    .video-wrap iframe{
+      width:100%;
+      height:420px;
+      border:none;
+      display:block;
+    }
+
+    .resources{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .resource{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .resource__left strong{
+      display:block;
+      margin-bottom:3px;
+    }
+
+    .resource__left span{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .resource__btn{
+      white-space:nowrap;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .mini-card{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .mini-card h4{
+      margin:0 0 8px;
+      font-size:16px;
+    }
+
+    .mini-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .note{
+      margin-top:18px;
+      padding:14px;
+      border-radius:16px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .note strong{color:var(--text)}
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .video-wrap iframe{height:280px}
+      .mini-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html" aria-label="Charly Cursos">
+        <span class="brand__mark">C</span>
+        <span class="brand__text">
+          <strong>CHARLY</strong>
+          <small>CURSOS</small>
+        </span>
+      </a>
+
+      <div class="topbar__actions">
+        <a class="btn btn--ghost" href="campus.html">Volver al campus</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="pill">Contenido del campus</p>
+        <h1>Biblioteca de <span class="accent">módulos</span> y clases</h1>
+        <p class="subtitle">
+          Acá queda cargado el contenido real del campus: clases, ejercicios, materiales,
+          actividades y trabajos finales de cada formación.
+        </p>
+      </div>
+    </section>
+
+    <section class="container layout">
+      <aside class="sidebar">
+        <h3>Ir a un curso</h3>
+        <div class="nav-list">
+          <a class="nav-link" href="#personal-trainer">Instructorado Personal Trainer</a>
+          <a class="nav-link" href="#nutricion">Nutrición aplicada al deporte</a>
+          <a class="nav-link" href="#funcional-hiit">Entrenamiento Funcional y HIIT</a>
+          <a class="nav-link" href="#musculacion">Instructor de Musculación</a>
+          <a class="nav-link" href="#pack-completo">Pack completo</a>
+        </div>
+      </aside>
+
+      <div class="content">
+        <section class="course" id="personal-trainer">
+          <div class="course__top">
+            <div class="course__badge">Curso individual</div>
+            <h2 class="course__title">Instructorado Personal Trainer</h2>
+            <p class="course__desc">
+              Formación integral con clases teóricas, ejercicios complementarios, actividades,
+              marketing, planificación y base de nutrición aplicada.
+            </p>
+          </div>
+
+          <article class="lesson">
+            <h3>Clase 1 — Introducción al manual</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/1M6BCJ9EqSs" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=ncrkEPwVloA" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 1</strong>
+                  <span>Flexiones, sentadillas, crunch, sit up, planchas, elevación de caderas y más.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 2 — Perfiles y características de entrenadores y clientes</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/wn9LKpsIBt0" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=dpY7Q-2n4xY" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 2</strong>
+                  <span>Estocada, swing, thruster y sentadilla con salto.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1mM4s4-O0F6tugpfAmEllRF0ldKj7EQpS/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 1</strong>
+                  <span>Trabajo práctico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+            <a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 3 — Principios del entrenamiento físico</h3>
+            <p>Sistemas de entrenamiento, pros y contras.</p>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/SsNtC4dLEFw" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=TaxLxS5KGLs" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 3</strong>
+                  <span>Nados, press de hombro con banda, vuelos combinados, superman con rolido.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1xSsulLVKlXDWBVCKmV3rz2-eNoB3wgZx/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 2</strong>
+                  <span>Trabajo práctico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              
+              <a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 4 — Entrada en calor, contracción muscular y fuerza</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/Pj5bQJ68JWk" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=Jyzt81_CPTc" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 4</strong>
+                  <span>Remo serrucho, remo al mentón, sumo remo y bíceps en variantes.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/15f7IX84ETJa3DOJispm6EkGxXE0UPrJY/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 3</strong>
+                  <span>Trabajo práctico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 5 — Fitness, potencial lesivo y armado de rutinas</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/4PYbk-eYPpc" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=ZbUvfBLmiLM" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 5</strong>
+                  <span>Bear crawl, brake dancer, Turkish Get Up, flexión con giro.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1mcx5DMIywtdc-K-oRndCwPJaMV3e7ogi/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 4</strong>
+                  <span>Trabajo práctico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              
+              <a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 6 — Marketing</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/IBtisfTcZcY" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=kTSCnsbgT3M" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 6</strong>
+                  <span>Jumping jacks, air squat jump, skipping, mountain climber.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 7 — Sistemas de entrenamiento: HIIT, EMOM, TABATA, AMRAP</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/K3J1i8BZuzI" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1WyLkHrnlFugGyrnefChdy2b5AEZit6QS/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 5</strong>
+                  <span>Trabajo práctico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 8 — Stretching y tercera edad</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/ll9qqx-68Ws" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1qJf7fSQyraT_2MW0o6zfyqjiutyGXhYD/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 6</strong>
+                  <span>Trabajo práctico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 9 — Elongación asistida</h3>
+            <div class="resources">
+              <a class="resource" href="https://www.youtube.com/watch?v=yl2lw9SX1uQ" target="_blank">
+                <div class="resource__left">
+                  <strong>Ejercicios clase 9</strong>
+                  <span>Video complementario de elongación asistida.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 10 — Método de intensidad y sistema Weider</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/UWYlsYGDmqc" allowfullscreen></iframe>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Material principal del curso</h3>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1fyc_-EmX_cfS4H-xE3gt1cGM3sf-kpfj/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Manual de estudio</strong>
+                  <span>Material central del instructorado.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://docs.google.com/document/d/1-AjdA4fDrqPp2IdDPCF8r348_CY7HvDR/edit?usp=drive_link&ouid=118337418829344810973&rtpof=true&sd=true" target="_blank">
+                <div class="resource__left">
+                  <strong>Trabajo final del curso</strong>
+                  <span>Entrega final del instructorado.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar trabajo
+</a>
+
+<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
+  📊 Ver estado / corrección
+</a>
+
+</div>
+            </div>
+          </article>
+        </section>
+
+        <section class="course" id="nutricion">
+          <div class="course__top">
+            <div class="course__badge">Curso individual</div>
+            <h2 class="course__title">Nutrición aplicada al deporte</h2>
+            <p class="course__desc">
+              Curso orientado a alimentación, rendimiento, composición corporal, hidratación y planificación nutricional.
+            </p>
+          </div>
+
+          <article class="lesson">
+            <h3>Presentación</h3>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1n5in-M7hee9_Thps3d8cttyaZVzxLQaK/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Presentación del curso</strong>
+                  <span>Documento de apertura y bienvenida.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 1 — Nutrición y alimentación</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/ZoBp-JlvHHE" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1_Tzm8zTZLOtn3jgNRMDFxkOjtCAfjZiU/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 1</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1WhiTxUj4vPeg8zluc3TP_hrTfaWlGlPI/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 2</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 2 — Micronutrientes e hidratación</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/a-pLtVGx_iw" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1ocZwbSKu8UU_vlL2bF37fXfJ89FcdJt0/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 1</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1bGvi-5l_wF1_4pI_qhtczBi_vXzN4bgi/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 2</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://docs.google.com/document/d/1VJiP93txN1Webk_pXSxauO5Hp-x5D4Hc/edit?usp=drive_link&ouid=118337418829344810973&rtpof=true&sd=true" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 1</strong>
+                  <span>Actividad de nutrición.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+            
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 3 — Sistemas energéticos y alimentación aplicada</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/Dh_viHVk6vs" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1zfHXRcswJIKldJCvZ2o9uwWTiIIAQPam/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 1</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1lzZzDL9Nh74fcD8oPuL8uJgpJSvmNE0E/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 2</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://docs.google.com/document/d/1FOmMeyB_fAtJ1ZyOmM-dRMnbPtd0TrEG/edit?usp=drive_link&ouid=118337418829344810973&rtpof=true&sd=true" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 2</strong>
+                  <span>Actividad de nutrición.</span>
+                </div> 
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+            
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 4 — Batch cooking y planificación de menú</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/B7hYx7apoQY" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1W0i8hya9WyJzv470uDtmoMPDRY6Cs7P-/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 1</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/14clcxise0GI8HDp_qIhh7D1m7iHkzZYZ/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Material 2</strong>
+                  <span>Apunte complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://docs.google.com/document/d/1gdoldwYTiVaAPUr_vqx4ZnowU10lBpHL/edit?usp=drive_link&ouid=118337418829344810973&rtpof=true&sd=true" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad 3</strong>
+                  <span>Actividad final de nutrición.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+            
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+              <a class="resource" href="https://docs.google.com/document/d/1hXyT5485Lsb3Lzkda6ljfmcmOZGDpaRM/edit?usp=drive_link&ouid=118337418829344810973&rtpof=true&sd=true" target="_blank">
+                <div class="resource__left">
+                  <strong>Trabajo final</strong>
+                  <span>Evaluación final del curso.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar trabajo
+</a>
+
+<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
+  📊 Ver estado / corrección
+</a>
+
+</div>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Material general del curso</h3>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/19DdD31m3-HiewTF4fxiqCqmWnxuIUNiA/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Manual de estudio</strong>
+                  <span>Manual principal de nutrición.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/19JNpE0rhIZiuzBlwuwi_mEibZ_ainM_q/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Modelo plan de alimentación</strong>
+                  <span>Material descargable de referencia.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1R-bTlvH8D4ct7GOSOwP64BZNfYhtDHnu/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Manual de dietas</strong>
+                  <span>Complemento de consulta.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            </div>
+          </article>
+        </section>
+
+        <section class="course" id="funcional-hiit">
+          <div class="course__top">
+            <div class="course__badge">Curso individual</div>
+            <h2 class="course__title">Entrenamiento Funcional y HIIT</h2>
+            <p class="course__desc">
+              Formación orientada a sistemas intensivos, clases funcionales, armado de rutinas y metodologías aplicadas.
+            </p>
+          </div>
+
+          <article class="lesson">
+            <h3>Clase 1 — Introducción, beneficios y bases</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/04mXYkzHIAs" allowfullscreen></iframe>
+            </div>
+            <div class="mini-grid">
+              <div class="mini-card">
+                <h4>HIIT</h4>
+                <p><a href="https://youtu.be/aGtvfiBk1sg" target="_blank">Ver clase complementaria</a></p>
+              </div>
+              <div class="mini-card">
+                <h4>TABATA</h4>
+                <p><a href="https://youtu.be/V9hygH0MaOE" target="_blank">Ver clase complementaria</a></p>
+              </div>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 2 — Dónde se hacen las clases y armado de rutinas</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/dxOEP5-H_uQ" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://youtu.be/32uqweReGyM" target="_blank">
+                <div class="resource__left">
+                  <strong>AMRAP</strong>
+                  <span>Contenido complementario.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtu.be/3jDJqfT3Ffw" target="_blank">
+                <div class="resource__left">
+                  <strong>EMOM</strong>
+                  <span>Contenido complementario.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1rqsU9fC8RE4luetfU4z8omNgtFOW1SmN/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad</strong>
+                  <span>Trabajo práctico del módulo.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+              
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 3 — Sistemas de entrenamiento</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/sHwYgrMzpGQ" allowfullscreen></iframe>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 4 — Escalera, rounds y manipulación de elementos</h3>
+            <div class="resources">
+              <a class="resource" href="https://youtu.be/2St2A55Kvd0" target="_blank">
+                <div class="resource__left">
+                  <strong>Escalera</strong>
+                  <span>Video complementario.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtu.be/I5z7hIU0x_E" target="_blank">
+                <div class="resource__left">
+                  <strong>Rounds</strong>
+                  <span>Video complementario.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtu.be/7qpgVSZvPiM" target="_blank">
+                <div class="resource__left">
+                  <strong>Sentadillas</strong>
+                  <span>Video complementario.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtu.be/CqkwIomH0_Q" target="_blank">
+                <div class="resource__left">
+                  <strong>Manipulación de elementos</strong>
+                  <span>Video complementario.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1oNC6KePPxllX6djGhrOik76-0XV9WHh3/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Trabajo final</strong>
+                  <span>Evaluación final del curso.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar trabajo
+</a>
+
+<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
+  📊 Ver estado / corrección
+</a>
+
+</div>
+              <a class="resource" href="https://drive.google.com/file/d/1ttijoVym4lNqWNdmTyqKj7wSlMvHwRc_/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Manual de estudio</strong>
+                  <span>Material principal del curso.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            </div>
+          </article>
+        </section>
+
+        <section class="course" id="musculacion">
+          <div class="course__top">
+            <div class="course__badge">Curso individual</div>
+            <h2 class="course__title">Instructor de Musculación</h2>
+            <p class="course__desc">
+              Curso orientado a musculación, principios de Weider, armado de rutinas, técnica y movimientos por grupo muscular.
+            </p>
+          </div>
+
+          <article class="lesson">
+            <h3>Clase 1 — Qué es un instructor de musculación</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/k_CEX3NeV7Q" allowfullscreen></iframe>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 2 — 10 principios de Weider</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/R8Qj2yZFyko" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://youtube.com/shorts/NVJEdgo0zRk" target="_blank">
+                <div class="resource__left">
+                  <strong>Espalda</strong>
+                  <span>Short técnico.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtube.com/shorts/rryWY4-FtZE" target="_blank">
+                <div class="resource__left">
+                  <strong>Hombros</strong>
+                  <span>Short técnico.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtube.com/shorts/RUCB0asFNRM" target="_blank">
+                <div class="resource__left">
+                  <strong>Bíceps</strong>
+                  <span>Short técnico.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/18XiX6e1MA_XR0TutRK_ejy7XLCCpZLup/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Actividad</strong>
+                  <span>Trabajo práctico del módulo.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+            
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar actividad
+</a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 3 — Grupo muscular complementario</h3>
+            <div class="resources">
+              <a class="resource" href="https://youtube.com/shorts/T_S0g-IC3BM" target="_blank">
+                <div class="resource__left">
+                  <strong>Pecho</strong>
+                  <span>Short técnico.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtube.com/shorts/Pw7JV8B4dyU" target="_blank">
+                <div class="resource__left">
+                  <strong>Tríceps</strong>
+                  <span>Short técnico.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+              <a class="resource" href="https://youtube.com/shorts/3hs6fUN12UU" target="_blank">
+                <div class="resource__left">
+                  <strong>Piernas</strong>
+                  <span>Short técnico.</span>
+                </div>
+                <span class="btn resource__btn">Ver</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="lesson">
+            <h3>Clase 4 — Armado de rutinas</h3>
+            <div class="video-wrap">
+              <iframe src="https://www.youtube.com/embed/iEpd1xEYlLI" allowfullscreen></iframe>
+            </div>
+            <div class="resources">
+              <a class="resource" href="https://drive.google.com/file/d/1pKkgAbMlMxtAn31j6nLQmOZmZs9PC9r6/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Rutinas</strong>
+                  <span>Documento de apoyo.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1dROzaJxsMpzAhKEldeFiI-bxYWvTOqBq/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Trabajo final</strong>
+                  <span>Evaluación final del curso.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a> 
+
+<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
+  📤 Entregar trabajo
+</a>
+
+<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
+  📊 Ver estado / corrección
+</a>
+
+</div>
+              <a class="resource" href="https://drive.google.com/file/d/1FVzT1a4yw5kS2UDOxq-Fm0mSHuHELA7g/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Manual de estudio</strong>
+                  <span>Manual principal del curso.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+              <a class="resource" href="https://drive.google.com/file/d/1-OdDHcHRje4Kc7rlRnu8nqe9bArWYb2A/view?usp=drive_link" target="_blank">
+                <div class="resource__left">
+                  <strong>Guía de movimientos</strong>
+                  <span>Material técnico complementario.</span>
+                </div>
+                <span class="btn resource__btn">Abrir</span>
+              </a>
+            </div>
+          </article>
+        </section>
+
+        <section class="course" id="pack-completo">
+          <div class="course__top">
+            <div class="course__badge">Plan recomendado</div>
+            <h2 class="course__title">Pack completo</h2>
+            <p class="course__desc">
+              Acceso total a las 4 formaciones: Personal Trainer, Nutrición aplicada al deporte,
+              Funcional y HIIT, e Instructor de Musculación.
+            </p>
+          </div>
+
+          <div class="mini-grid">
+            <div class="mini-card">
+              <h4>Instructorado Personal Trainer</h4>
+              <p>10 clases, ejercicios, actividades, manual y trabajo final.</p>
+            </div>
+            <div class="mini-card">
+              <h4>Nutrición aplicada al deporte</h4>
+              <p>4 clases, materiales, actividades y trabajo final.</p>
+            </div>
+            <div class="mini-card">
+              <h4>Entrenamiento Funcional y HIIT</h4>
+              <p>4 bloques, videos complementarios, actividad y trabajo final.</p>
+            </div>
+            <div class="mini-card">
+              <h4>Instructor de Musculación</h4>
+              <p>4 bloques, shorts técnicos, manual, guía y trabajo final.</p>
+            </div>
+          </div>
+
+          <div class="note">
+            <strong>Nota:</strong> este plan está pensado para mostrar el valor de la formación integral.
+            Después podés hacer que el alumno vea todo este contenido desde un solo acceso.
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function aplicarFiltroPlan() {
+      const plan = localStorage.getItem("plan");
+
+      const secciones = {
+        personal: document.getElementById("personal-trainer"),
+        nutricion: document.getElementById("nutricion"),
+        hiit: document.getElementById("funcional-hiit"),
+        musculacion: document.getElementById("musculacion"),
+        completo: document.getElementById("pack-completo")
+      };
+
+      const navLinks = {
+        personal: document.querySelector('a[href="#personal-trainer"]'),
+        nutricion: document.querySelector('a[href="#nutricion"]'),
+        hiit: document.querySelector('a[href="#funcional-hiit"]'),
+        musculacion: document.querySelector('a[href="#musculacion"]'),
+        completo: document.querySelector('a[href="#pack-completo"]')
+      };
+
+      Object.values(secciones).forEach(sec => {
+        if (sec) sec.style.display = "none";
+      });
+
+      Object.values(navLinks).forEach(link => {
+        if (link) link.style.display = "none";
+      });
+
+      if (plan === "completo") {
+        Object.values(secciones).forEach(sec => {
+          if (sec) sec.style.display = "block";
+        });
+        Object.values(navLinks).forEach(link => {
+          if (link) link.style.display = "block";
+        });
+        return;
+      }
+
+      if (secciones[plan]) {
+        secciones[plan].style.display = "block";
+      }
+
+      if (navLinks[plan]) {
+        navLinks[plan].style.display = "block";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", aplicarFiltroPlan);
+  </script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin | Charly Cursos</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:#070a0f;
+      color:white;
+    }
+
+    .container{
+      width:min(1100px,92%);
+      margin:auto;
+      padding:24px 0;
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+
+    h1{
+      margin:0;
+      font-size:32px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:white;
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(96,214,255,.28), rgba(90,107,255,.22));
+      border-color:rgba(96,214,255,.25);
+    }
+
+    .btn-ok{
+      background:rgba(34,197,94,.18);
+      border-color:rgba(34,197,94,.35);
+    }
+
+    .btn-bad{
+      background:rgba(239,68,68,.16);
+      border-color:rgba(239,68,68,.35);
+    }
+
+    .panel{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:20px;
+      padding:16px;
+    }
+
+    .status{
+      margin:12px 0;
+      color:rgba(255,255,255,.7);
+    }
+
+    .grid{
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+
+    .card{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .card-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .card h3{
+      margin:0 0 4px;
+      font-size:20px;
+    }
+
+    .muted{
+      color:rgba(255,255,255,.62);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .tag{
+      display:inline-flex;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      font-weight:800;
+      color:rgba(255,255,255,.78);
+    }
+
+    .tag-pendiente{color:#fde68a;border-color:rgba(253,230,138,.28)}
+    .tag-aprobado{color:#86efac;border-color:rgba(134,239,172,.28)}
+    .tag-corregir{color:#fca5a5;border-color:rgba(252,165,165,.28)}
+
+    .actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    textarea{
+      width:100%;
+      min-height:70px;
+      margin-top:10px;
+      border:none;
+      border-radius:12px;
+      padding:12px;
+      box-sizing:border-box;
+      resize:vertical;
+      font-family:inherit;
+    }
+
+    @media(max-width:700px){
+      h1{font-size:26px}
+      .card-top{display:block}
+      .tag{margin-top:8px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <h1>Panel de entregas</h1>
+        <div class="muted">Revisión de trabajos enviados por alumnos.</div>
+      </div>
+
+      <div>
+        <a class="btn" href="campus.html">Volver al campus</a>
+        <button class="btn btn-primary" onclick="cargarEntregas()">Actualizar</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div id="status" class="status">Cargando entregas...</div>
+      <div id="lista" class="grid"></div>
+    </div>
+  </div>
+
+<script>
+const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
+const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+function estadoClase(estado){
+  if(estado === "aprobado") return "tag tag-aprobado";
+  if(estado === "corregir") return "tag tag-corregir";
+  return "tag tag-pendiente";
+}
+
+function fechaLinda(fecha){
+  if(!fecha) return "";
+  return new Date(fecha).toLocaleString("es-AR");
+}
+
+async function cargarEntregas(){
+  const status = document.getElementById("status");
+  const lista = document.getElementById("lista");
+
+  status.innerText = "Cargando entregas...";
+  lista.innerHTML = "";
+
+  const { data, error } = await supabase
+    .from("entregas")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  if(error){
+    status.innerText = "Error cargando entregas: " + error.message;
+    console.log(error);
+    return;
+  }
+
+  if(!data || data.length === 0){
+    status.innerText = "Todavía no hay trabajos enviados.";
+    return;
+  }
+
+  status.innerText = "Total de entregas: " + data.length;
+
+  data.forEach(entrega => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <h3>${entrega.nombre || "Alumno sin nombre"}</h3>
+          <div class="muted">${entrega.user_email || "Sin email"}</div>
+          <div class="muted">Curso: <strong>${entrega.curso || "Sin curso"}</strong></div>
+          <div class="muted">Fecha: ${fechaLinda(entrega.created_at)}</div>
+        </div>
+        <span class="${estadoClase(entrega.estado)}">${entrega.estado || "pendiente"}</span>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="${entrega.archivo_url}" target="_blank">Abrir archivo</a>
+        <button class="btn btn-ok" onclick="actualizarEstado('${entrega.id}', 'aprobado')">Aprobar</button>
+        <button class="btn btn-bad" onclick="actualizarEstado('${entrega.id}', 'corregir')">Pedir corrección</button>
+        <button class="btn" onclick="actualizarEstado('${entrega.id}', 'pendiente')">Pendiente</button>
+      </div>
+
+      <textarea id="comentario-${entrega.id}" placeholder="Comentario para el alumno...">${entrega.comentario || ""}</textarea>
+
+      <div class="actions">
+        <button class="btn" onclick="guardarComentario('${entrega.id}')">Guardar comentario</button>
+      </div>
+    `;
+
+    lista.appendChild(card);
+  });
+}
+
+async function actualizarEstado(id, estado){
+  const { error } = await supabase
+    .from("entregas")
+    .update({ estado: estado })
+    .eq("id", id);
+
+  if(error){
+    alert("Error actualizando estado: " + error.message);
+    console.log(error);
+    return;
+  }
+
+  cargarEntregas();
+}
+
+async function guardarComentario(id){
+  const comentario = document.getElementById("comentario-" + id).value;
+
+  const { error } = await supabase
+    .from("entregas")
+    .update({ comentario: comentario })
+    .eq("id", id);
+
+  if(error){
+    alert("Error guardando comentario: " + error.message);
+    console.log(error);
+    return;
+  }
+
+  alert("Comentario guardado");
+}
+
+cargarEntregas();
+</script>
+
+</body>
+</html>

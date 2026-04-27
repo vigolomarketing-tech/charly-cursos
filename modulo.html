@@ -1,227 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Campus | Entregas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus | Módulos</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="style.css">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+body{
+  background:#0b0f1a;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
+}
 
-    .container {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
+h1{
+  text-align:center;
+}
 
-    .top-actions a {
-      color: white;
-      text-decoration: none;
-      background: #1e293b;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-weight: bold;
-    }
+.modulo{
+  background:#12182b;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
 
-    h1 {
-      margin-bottom: 10px;
-    }
+.modulo h2{
+  margin-bottom:10px;
+}
 
-    .card {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
+.clase{
+  background:#1a2238;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:10px;
+}
 
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
-      box-sizing: border-box;
-      font-size: 15px;
-    }
+.btn{
+  display:inline-block;
+  padding:10px 15px;
+  border-radius:8px;
+  background:#00d4ff;
+  color:#000;
+  text-decoration:none;
+  font-weight:bold;
+  margin-top:8px;
+}
 
-    button {
-      margin-top: 15px;
-      padding: 12px;
-      width: 100%;
-      background: #22c55e;
-      border: none;
-      border-radius: 8px;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-    }
+.btn-entrega{
+  background:#5a6bff;
+  color:#fff;
+}
+</style>
 
-    button:hover {
-      background: #16a34a;
-    }
-
-    .status {
-      margin-top: 12px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .user-box {
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 10px;
-      padding: 12px;
-      margin-top: 14px;
-      color: rgba(255,255,255,.85);
-      font-size: 14px;
-    }
-  </style>
 </head>
 
 <body>
 
 <div class="container">
-  <div class="top-actions">
-    <a href="campus.html">← Volver al campus</a>
-    <a href="login.html">Login</a>
+
+<h1>📚 Campus de cursos</h1>
+
+<!-- PERSONAL TRAINER -->
+<div class="modulo">
+  <h2>🏋️ Personal Trainer</h2>
+
+  <div class="clase">
+    <p>Clase 1 - Introducción</p>
+    <a href="LINK_YOUTUBE" class="btn" target="_blank">Ver clase</a>
   </div>
 
-  <h1>📚 Campus del alumno</h1>
-  <p>Subí tu trabajo final para que sea corregido.</p>
-
-  <div class="user-box" id="userBox">
-    Verificando sesión...
+  <div class="clase">
+    <p>Material PDF</p>
+    <a href="LINK_DRIVE" class="btn" target="_blank">Ver material</a>
   </div>
 
-  <div class="card">
-    <h2>📤 Entregar trabajo</h2>
-
-    <input type="text" id="nombre" placeholder="Tu nombre completo" />
-
-    <select id="curso">
-      <option value="">Seleccionar curso</option>
-      <option value="Personal Trainer">Personal Trainer</option>
-      <option value="Musculación">Musculación</option>
-      <option value="Funcional & HIIT">Funcional & HIIT</option>
-      <option value="Nutrición">Nutrición</option>
-      <option value="Pack completo">Pack completo</option>
-    </select>
-
-    <input type="file" id="archivo" />
-
-    <button onclick="subirTrabajo()">Subir trabajo</button>
-
-    <div class="status" id="status"></div>
-  </div>
+  <a href="entregas.html" class="btn btn-entrega">📤 Entregar trabajo</a>
 </div>
 
-<script>
-  const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
-  const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+<!-- MUSCULACION -->
+<div class="modulo">
+  <h2>💪 Musculación</h2>
 
-  async function verificarSesion() {
-    const userBox = document.getElementById("userBox");
+  <div class="clase">
+    <p>Clase 1</p>
+    <a href="#" class="btn">Ver clase</a>
+  </div>
 
-    const { data, error } = await supabase.auth.getUser();
+  <a href="entregas.html" class="btn btn-entrega">📤 Entregar trabajo</a>
+</div>
 
-    if (error || !data.user) {
-      userBox.innerHTML = "⚠️ No hay sesión iniciada. Primero tenés que ingresar con tu cuenta.";
-      return null;
-    }
+<!-- HIIT -->
+<div class="modulo">
+  <h2>⚡ Funcional & HIIT</h2>
 
-    userBox.innerHTML = "✅ Sesión iniciada: <strong>" + data.user.email + "</strong>";
-    return data.user;
-  }
+  <div class="clase">
+    <p>Clase 1</p>
+    <a href="#" class="btn">Ver clase</a>
+  </div>
 
-  async function subirTrabajo() {
-    const nombre = document.getElementById("nombre").value.trim();
-    const curso = document.getElementById("curso").value;
-    const archivo = document.getElementById("archivo").files[0];
-    const status = document.getElementById("status");
+  <a href="entregas.html" class="btn btn-entrega">📤 Entregar trabajo</a>
+</div>
 
-    if (!nombre || !curso || !archivo) {
-      status.innerText = "⚠️ Completá todos los campos";
-      return;
-    }
+<!-- NUTRICION -->
+<div class="modulo">
+  <h2>🥗 Nutrición</h2>
 
-    const { data, error } = await supabase.auth.getUser();
+  <div class="clase">
+    <p>Clase 1</p>
+    <a href="#" class="btn">Ver clase</a>
+  </div>
 
-    if (error || !data.user) {
-      status.innerText = "❌ No estás logueado. Iniciá sesión antes de subir el trabajo.";
-      return;
-    }
+  <a href="entregas.html" class="btn btn-entrega">📤 Entregar trabajo</a>
+</div>
 
-    const email = data.user.email;
-
-    status.innerText = "Subiendo archivo...";
-
-    const nombreSeguro = archivo.name
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zA-Z0-9._-]/g, "_");
-
-    const fileName = `${Date.now()}-${nombreSeguro}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("entregas")
-      .upload(fileName, archivo);
-
-    if (uploadError) {
-      status.innerText = "❌ Error al subir archivo: " + uploadError.message;
-      console.log(uploadError);
-      return;
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from("entregas")
-      .getPublicUrl(fileName);
-
-    const archivo_url = publicUrlData.publicUrl;
-
-    const { error: dbError } = await supabase
-      .from("entregas")
-      .insert([
-        {
-          user_email: email,
-          nombre: nombre,
-          curso: curso,
-          archivo_url: archivo_url,
-          estado: "pendiente"
-        }
-      ]);
-
-    if (dbError) {
-      status.innerText = "❌ Error guardando en base de datos: " + dbError.message;
-      console.log(dbError);
-      return;
-    }
-
-    status.innerText = "✅ Trabajo enviado correctamente. Queda pendiente de corrección.";
-
-    document.getElementById("nombre").value = "";
-    document.getElementById("curso").value = "";
-    document.getElementById("archivo").value = "";
-  }
-
-  verificarSesion();
-</script>
+</div>
 
 </body>
 </html>

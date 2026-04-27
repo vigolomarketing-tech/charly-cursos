@@ -36,6 +36,7 @@
       margin-top:10px;
       border-radius:8px;
       border:none;
+      box-sizing:border-box;
     }
 
     button{
@@ -58,6 +59,7 @@
       display:flex;
       gap:10px;
       margin-bottom:20px;
+      flex-wrap:wrap;
     }
 
     .top a{
@@ -73,6 +75,17 @@
       margin-top:10px;
       font-size:14px;
       color:#aaa;
+    }
+
+    .info-entrega{
+      margin-top:14px;
+      padding:12px;
+      background:rgba(96,214,255,.10);
+      border:1px solid rgba(96,214,255,.18);
+      border-radius:12px;
+      color:rgba(255,255,255,.86);
+      font-size:14px;
+      line-height:1.5;
     }
   </style>
 </head>
@@ -90,6 +103,10 @@
   <p>Subí tu archivo para que el profesor lo revise y corrija.</p>
 
   <div class="user" id="userBox">Verificando sesión...</div>
+
+  <div class="info-entrega" id="infoEntrega">
+    Entrega general del campus.
+  </div>
 
   <div class="card">
 
@@ -119,6 +136,28 @@ const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
 const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+const params = new URLSearchParams(window.location.search);
+const tipoEntrega = params.get("tipo") || "general";
+const nombreEntrega = params.get("nombre") || "Entrega general";
+
+function formatearTexto(texto){
+  return texto
+    .replaceAll("-", " ")
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, letra => letra.toUpperCase());
+}
+
+function mostrarInfoEntrega(){
+  const info = document.getElementById("infoEntrega");
+
+  if(tipoEntrega === "general"){
+    info.innerText = "Estás realizando una entrega general del campus.";
+    return;
+  }
+
+  info.innerText = "Estás entregando: " + formatearTexto(tipoEntrega) + " — " + formatearTexto(nombreEntrega);
+}
+
 async function verificarSesion(){
   const { data } = await supabase.auth.getUser();
   const box = document.getElementById("userBox");
@@ -128,11 +167,11 @@ async function verificarSesion(){
     return;
   }
 
-  box.innerText = "✅ " + data.user.email;
+  box.innerText = "✅ Sesión iniciada: " + data.user.email;
 }
 
 async function subirTrabajo(){
-  const nombre = document.getElementById("nombre").value;
+  const nombre = document.getElementById("nombre").value.trim();
   const curso = document.getElementById("curso").value;
   const archivo = document.getElementById("archivo").files[0];
   const status = document.getElementById("status");
@@ -153,7 +192,12 @@ async function subirTrabajo(){
 
   status.innerText = "Subiendo archivo...";
 
-  const fileName = Date.now() + "-" + archivo.name;
+  const nombreSeguro = archivo.name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "_");
+
+  const fileName = Date.now() + "-" + nombreSeguro;
 
   const { error: uploadError } = await supabase.storage
     .from("entregas")
@@ -171,6 +215,8 @@ async function subirTrabajo(){
 
   const archivo_url = urlData.publicUrl;
 
+  const detalleEntrega = tipoEntrega + " - " + nombreEntrega;
+
   const { error: dbError } = await supabase
     .from("entregas")
     .insert([
@@ -179,6 +225,7 @@ async function subirTrabajo(){
         nombre: nombre,
         curso: curso,
         archivo_url: archivo_url,
+        comentario: detalleEntrega,
         estado: "pendiente"
       }
     ]);
@@ -196,6 +243,7 @@ async function subirTrabajo(){
   document.getElementById("archivo").value = "";
 }
 
+mostrarInfoEntrega();
 verificarSesion();
 </script>
 

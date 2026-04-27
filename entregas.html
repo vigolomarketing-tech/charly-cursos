@@ -1,250 +1,171 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Entregas | Campus</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>Entregas | Campus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    body{
-      margin:0;
-      font-family:system-ui;
-      background:#070a0f;
-      color:white;
-    }
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#070a0f;
+  color:white;
+}
 
-    .container{
-      max-width:700px;
-      margin:auto;
-      padding:20px;
-    }
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:20px;
+}
 
-    h1{margin-bottom:10px;}
+.top{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
 
-    .card{
-      background:#1e293b;
-      padding:20px;
-      border-radius:12px;
-      margin-top:20px;
-    }
+.top a{
+  text-decoration:none;
+  background:#1e293b;
+  padding:10px 14px;
+  border-radius:999px;
+  color:white;
+  font-weight:bold;
+}
 
-    input, select{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border-radius:8px;
-      border:none;
-      box-sizing:border-box;
-    }
+.card{
+  background:#1e293b;
+  padding:20px;
+  border-radius:12px;
+  margin-top:20px;
+}
 
-    button{
-      margin-top:15px;
-      padding:12px;
-      width:100%;
-      background:#22c55e;
-      border:none;
-      border-radius:8px;
-      font-weight:bold;
-      cursor:pointer;
-    }
+input, select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
 
-    .status{
-      margin-top:10px;
-      font-size:14px;
-    }
+button{
+  margin-top:15px;
+  padding:12px;
+  width:100%;
+  background:#22c55e;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .top{
-      display:flex;
-      gap:10px;
-      margin-bottom:20px;
-      flex-wrap:wrap;
-    }
+.status{
+  margin-top:10px;
+  font-size:14px;
+}
 
-    .top a{
-      text-decoration:none;
-      background:#1e293b;
-      padding:10px 14px;
-      border-radius:999px;
-      color:white;
-      font-weight:bold;
-    }
-
-    .user{
-      margin-top:10px;
-      font-size:14px;
-      color:#aaa;
-    }
-
-    .info-entrega{
-      margin-top:14px;
-      padding:12px;
-      background:rgba(96,214,255,.10);
-      border:1px solid rgba(96,214,255,.18);
-      border-radius:12px;
-      color:rgba(255,255,255,.86);
-      font-size:14px;
-      line-height:1.5;
-    }
-  </style>
+.info{
+  margin-top:10px;
+  padding:10px;
+  background:#111827;
+  border-radius:8px;
+  font-size:14px;
+  color:#aaa;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-  <div class="top">
-    <a href="modulo.html">← Volver al módulo</a>
-    <a href="login.html">Login</a>
-  </div>
+<div class="top">
+<a href="modulo.html">← Volver</a>
+<a href="login.html">Login</a>
+</div>
 
-  <h1>📤 Entregar actividad / trabajo final</h1>
-  <p>Subí tu archivo para que el profesor lo revise y corrija.</p>
+<h1>📤 Entregar actividad / trabajo</h1>
 
-  <div class="user" id="userBox">Verificando sesión...</div>
+<div class="info" id="infoEntrega"></div>
 
-  <div class="info-entrega" id="infoEntrega">
-    Entrega general del campus.
-  </div>
+<div class="card">
 
-  <div class="card">
+<input type="text" id="nombre" placeholder="Tu nombre">
+<select id="curso">
+<option value="">Seleccionar curso</option>
+<option>Personal Trainer</option>
+<option>Musculación</option>
+<option>Funcional & HIIT</option>
+<option>Nutrición</option>
+</select>
 
-    <input type="text" id="nombre" placeholder="Tu nombre completo">
+<input type="file" id="archivo">
 
-    <select id="curso">
-      <option value="">Seleccionar curso</option>
-      <option>Personal Trainer</option>
-      <option>Musculación</option>
-      <option>Funcional & HIIT</option>
-      <option>Nutrición</option>
-      <option>Pack completo</option>
-    </select>
+<button onclick="subir()">Enviar entrega</button>
 
-    <input type="file" id="archivo">
+<div class="status" id="status"></div>
 
-    <button onclick="subirTrabajo()">Enviar entrega</button>
-
-    <div class="status" id="status"></div>
-
-  </div>
+</div>
 
 </div>
 
 <script>
-const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
-const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabase = window.supabase.createClient(
+"https://yfdiejyrhaaziceyeiuc.supabase.co",
+"sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
+);
 
 const params = new URLSearchParams(window.location.search);
-const tipoEntrega = params.get("tipo") || "general";
-const nombreEntrega = params.get("nombre") || "Entrega general";
+const tipo = params.get("tipo") || "general";
+const nombreEntrega = params.get("nombre") || "general";
 
-function formatearTexto(texto){
-  return texto
-    .replaceAll("-", " ")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, letra => letra.toUpperCase());
+document.getElementById("infoEntrega").innerText =
+"Estás entregando: " + tipo + " - " + nombreEntrega;
+
+async function subir(){
+
+const nombre = document.getElementById("nombre").value;
+const curso = document.getElementById("curso").value;
+const archivo = document.getElementById("archivo").files[0];
+const status = document.getElementById("status");
+
+if(!nombre || !curso || !archivo){
+status.innerText = "⚠️ Completá todo";
+return;
 }
 
-function mostrarInfoEntrega(){
-  const info = document.getElementById("infoEntrega");
+const { data } = await supabase.auth.getUser();
 
-  if(tipoEntrega === "general"){
-    info.innerText = "Estás realizando una entrega general del campus.";
-    return;
-  }
-
-  info.innerText = "Estás entregando: " + formatearTexto(tipoEntrega) + " — " + formatearTexto(nombreEntrega);
+if(!data.user){
+status.innerText = "❌ Iniciá sesión";
+return;
 }
 
-async function verificarSesion(){
-  const { data } = await supabase.auth.getUser();
-  const box = document.getElementById("userBox");
+const fileName = Date.now() + "-" + archivo.name;
 
-  if(!data.user){
-    box.innerText = "❌ No estás logueado";
-    return;
-  }
+await supabase.storage
+.from("entregas")
+.upload(fileName, archivo);
 
-  box.innerText = "✅ Sesión iniciada: " + data.user.email;
+const { data: urlData } = supabase.storage
+.from("entregas")
+.getPublicUrl(fileName);
+
+await supabase.from("entregas").insert([{
+user_email: data.user.email,
+nombre: nombre,
+curso: curso,
+archivo_url: urlData.publicUrl,
+tipo: tipo,
+nombre_entrega: nombreEntrega,
+estado: "pendiente"
+}]);
+
+status.innerText = "✅ Entregado";
 }
-
-async function subirTrabajo(){
-  const nombre = document.getElementById("nombre").value.trim();
-  const curso = document.getElementById("curso").value;
-  const archivo = document.getElementById("archivo").files[0];
-  const status = document.getElementById("status");
-
-  if(!nombre || !curso || !archivo){
-    status.innerText = "⚠️ Completá todos los campos";
-    return;
-  }
-
-  const { data } = await supabase.auth.getUser();
-
-  if(!data.user){
-    status.innerText = "❌ Tenés que iniciar sesión";
-    return;
-  }
-
-  const email = data.user.email;
-
-  status.innerText = "Subiendo archivo...";
-
-  const nombreSeguro = archivo.name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9._-]/g, "_");
-
-  const fileName = Date.now() + "-" + nombreSeguro;
-
-  const { error: uploadError } = await supabase.storage
-    .from("entregas")
-    .upload(fileName, archivo);
-
-  if(uploadError){
-    status.innerText = "❌ Error subiendo archivo";
-    console.log(uploadError);
-    return;
-  }
-
-  const { data: urlData } = supabase.storage
-    .from("entregas")
-    .getPublicUrl(fileName);
-
-  const archivo_url = urlData.publicUrl;
-
-  const detalleEntrega = tipoEntrega + " - " + nombreEntrega;
-
-  const { error: dbError } = await supabase
-    .from("entregas")
-    .insert([
-      {
-        user_email: email,
-        nombre: nombre,
-        curso: curso,
-        archivo_url: archivo_url,
-        comentario: detalleEntrega,
-        estado: "pendiente"
-      }
-    ]);
-
-  if(dbError){
-    status.innerText = "❌ Error guardando en base de datos";
-    console.log(dbError);
-    return;
-  }
-
-  status.innerText = "✅ Entrega enviada correctamente";
-
-  document.getElementById("nombre").value = "";
-  document.getElementById("curso").value = "";
-  document.getElementById("archivo").value = "";
-}
-
-mostrarInfoEntrega();
-verificarSesion();
 </script>
 
 </body>

@@ -1174,55 +1174,57 @@
 
     document.addEventListener("DOMContentLoaded", aplicarFiltroPlan);
   </script>
-  <script>
-  function aplicarBloqueoDemo() {
-    const progreso = JSON.parse(localStorage.getItem("progresoDemo")) || {
-      personal: 1,
-      nutricion: 1,
-      hiit: 1,
-      musculacion: 1
-    };
+<script>
+const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
+const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const cursos = [
-      { id: "personal-trainer", key: "personal" },
-      { id: "nutricion", key: "nutricion" },
-      { id: "funcional-hiit", key: "hiit" },
-      { id: "musculacion", key: "musculacion" }
-    ];
+async function aplicarBloqueoReal() {
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) return;
 
-    cursos.forEach(curso => {
-      const seccion = document.getElementById(curso.id);
-      if (!seccion) return;
+  const email = data.user.email;
 
-      const clases = seccion.querySelectorAll(".lesson");
-      const permitidas = progreso[curso.key] || 1;
+  const cursos = [
+    { id: "personal-trainer", key: "personal" },
+    { id: "nutricion", key: "nutricion" },
+    { id: "funcional-hiit", key: "hiit" },
+    { id: "musculacion", key: "musculacion" }
+  ];
 
-      clases.forEach((clase, index) => {
-        const numeroClase = index + 1;
+  for (const curso of cursos) {
+    const { data: progreso } = await supabase
+      .from("progreso_alumnos")
+      .select("clase_actual")
+      .eq("user_email", email)
+      .eq("curso", curso.key)
+      .single();
 
-        if (numeroClase > permitidas) {
-          clase.style.opacity = "0.38";
-          clase.style.filter = "grayscale(1)";
-          clase.style.pointerEvents = "none";
-          clase.style.position = "relative";
+    const permitido = progreso?.clase_actual || 1;
 
-          const aviso = document.createElement("div");
-          aviso.innerHTML = "🔒 Clase bloqueada — se habilita al aprobar la etapa anterior";
-          aviso.style.marginTop = "12px";
-          aviso.style.padding = "12px";
-          aviso.style.borderRadius = "14px";
-          aviso.style.background = "rgba(255,255,255,.08)";
-          aviso.style.border = "1px solid rgba(255,255,255,.12)";
-          aviso.style.color = "rgba(255,255,255,.78)";
-          aviso.style.fontWeight = "700";
+    const seccion = document.getElementById(curso.id);
+    if (!seccion) continue;
 
-          clase.appendChild(aviso);
-        }
-      });
+    const clases = seccion.querySelectorAll(".lesson");
+
+    clases.forEach((clase, index) => {
+      if (index + 1 > permitido) {
+        clase.style.opacity = "0.4";
+        clase.style.pointerEvents = "none";
+
+        const aviso = document.createElement("div");
+        aviso.innerText = "🔒 Clase bloqueada";
+        aviso.style.marginTop = "10px";
+        aviso.style.fontWeight = "bold";
+        aviso.style.color = "#aaa";
+
+        clase.appendChild(aviso);
+      }
     });
   }
+}
 
-  document.addEventListener("DOMContentLoaded", aplicarBloqueoDemo);
+document.addEventListener("DOMContentLoaded", aplicarBloqueoReal);
 </script>
 </body>
 </html>

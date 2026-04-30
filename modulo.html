@@ -1180,10 +1180,14 @@ const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 async function aplicarBloqueoReal() {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
+  const { data: userData } = await supabase.auth.getUser();
 
-  const email = data.user.email;
+  if (!userData.user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const email = userData.user.email;
 
   const cursos = [
     { id: "personal-trainer", key: "personal" },
@@ -1193,38 +1197,50 @@ async function aplicarBloqueoReal() {
   ];
 
   for (const curso of cursos) {
+    const seccion = document.getElementById(curso.id);
+    if (!seccion) continue;
+
     const { data: progreso } = await supabase
       .from("progreso_alumnos")
       .select("clase_actual")
       .eq("user_email", email)
       .eq("curso", curso.key)
-      .single();
+      .maybeSingle();
 
-    const permitido = progreso?.clase_actual || 1;
-
-    const seccion = document.getElementById(curso.id);
-    if (!seccion) continue;
-
+    const clasePermitida = progreso?.clase_actual || 1;
     const clases = seccion.querySelectorAll(".lesson");
 
     clases.forEach((clase, index) => {
-      if (index + 1 > permitido) {
-        clase.style.opacity = "0.4";
+      const numeroClase = index + 1;
+
+      if (numeroClase > clasePermitida) {
+        clase.style.opacity = "0.35";
         clase.style.pointerEvents = "none";
+        clase.style.filter = "grayscale(1)";
 
-        const aviso = document.createElement("div");
-        aviso.innerText = "🔒 Clase bloqueada";
-        aviso.style.marginTop = "10px";
-        aviso.style.fontWeight = "bold";
-        aviso.style.color = "#aaa";
+        if (!clase.querySelector(".bloqueo-aviso")) {
+          const aviso = document.createElement("div");
+          aviso.className = "bloqueo-aviso";
+          aviso.innerText = "🔒 Clase bloqueada — se habilita al completar la etapa anterior.";
+          aviso.style.marginTop = "12px";
+          aviso.style.padding = "12px";
+          aviso.style.borderRadius = "14px";
+          aviso.style.background = "rgba(255,255,255,.08)";
+          aviso.style.border = "1px solid rgba(255,255,255,.12)";
+          aviso.style.color = "rgba(255,255,255,.78)";
+          aviso.style.fontWeight = "700";
 
-        clase.appendChild(aviso);
+          clase.appendChild(aviso);
+        }
       }
     });
   }
 }
 
-document.addEventListener("DOMContentLoaded", aplicarBloqueoReal);
+document.addEventListener("DOMContentLoaded", () => {
+  aplicarFiltroPlan();
+  aplicarBloqueoReal();
+});
 </script>
 </body>
 </html>

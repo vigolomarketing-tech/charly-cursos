@@ -56,6 +56,27 @@ const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
 const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+const ADMIN_EMAIL = "fitnesstrainingzone16@gmail.com";
+
+async function protegerAdmin() {
+
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user) {
+    alert("Tenés que iniciar sesión.");
+    window.location.href = "login.html";
+    return false;
+  }
+
+  if (data.user.email !== ADMIN_EMAIL) {
+    alert("No tenés permisos para entrar al panel.");
+    window.location.href = "campus.html";
+    return false;
+  }
+
+  return true;
+}
+
 function estadoClase(estado){
   if(estado === "aprobado") return "tag tag-aprobado";
   if(estado === "corregir") return "tag tag-corregir";

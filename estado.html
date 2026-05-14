@@ -1,58 +1,269 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estado del alumno</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado de entregas | Charly Cursos</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#070a0f;
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
+  <style>
+    :root{
+      --bg:#070a0f;
+      --panel:rgba(255,255,255,.05);
+      --stroke:rgba(255,255,255,.10);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.64);
+      --accent:#60d6ff;
+      --accent2:#5a6bff;
+      --shadow:0 16px 60px rgba(0,0,0,.45);
+    }
 
-.box{
-  width:90%;
-  max-width:500px;
-  background:rgba(255,255,255,.05);
-  border-radius:20px;
-  padding:20px;
-  text-align:center;
-}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(900px 600px at 20% 0%, rgba(96,214,255,.14), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(90,107,255,.14), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
 
-.estado{
-  margin-top:20px;
-  padding:15px;
-  border-radius:10px;
-  background:rgba(255,255,255,.08);
-}
-</style>
+    a{color:inherit;text-decoration:none}
+
+    .container{
+      width:min(700px,92%);
+      margin:0 auto;
+      padding:32px 0 48px;
+    }
+
+    .top{
+      display:flex;
+      gap:10px;
+      margin-bottom:28px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      padding:10px 16px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .btn--primary{
+      border-color:rgba(96,214,255,.25);
+      background:linear-gradient(135deg,rgba(96,214,255,.22),rgba(90,107,255,.18));
+    }
+
+    h1{
+      margin:0 0 6px;
+      font-size:clamp(24px,4vw,36px);
+      letter-spacing:-.5px;
+    }
+
+    .subtitle{
+      margin:0 0 28px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .loading{
+      color:var(--muted);
+      padding:20px 0;
+    }
+
+    .empty{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:20px;
+      padding:32px;
+      text-align:center;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .entrega-card{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:20px;
+      padding:18px;
+      margin-bottom:14px;
+      box-shadow:var(--shadow);
+    }
+
+    .entrega-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .entrega-nombre{
+      font-weight:800;
+      font-size:18px;
+      margin:0 0 4px;
+    }
+
+    .entrega-meta{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .tag{
+      display:inline-flex;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .tag--pendiente{
+      background:rgba(253,230,138,.10);
+      border:1px solid rgba(253,230,138,.28);
+      color:#fde68a;
+    }
+
+    .tag--aprobado{
+      background:rgba(134,239,172,.10);
+      border:1px solid rgba(134,239,172,.28);
+      color:#86efac;
+    }
+
+    .tag--corregir{
+      background:rgba(252,165,165,.10);
+      border:1px solid rgba(252,165,165,.28);
+      color:#fca5a5;
+    }
+
+    .comentario{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .comentario strong{
+      color:var(--text);
+      display:block;
+      margin-bottom:4px;
+    }
+
+    .fecha{
+      margin-top:8px;
+      font-size:13px;
+      color:rgba(255,255,255,.42);
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="top">
+      <a class="btn" href="modulo.html">← Volver al módulo</a>
+      <a class="btn btn--primary" href="campus.html">Campus</a>
+    </div>
 
-<div class="box">
-  <h1>📊 Estado de tu curso</h1>
+    <h1>📊 Estado de tus entregas</h1>
+    <p class="subtitle">Acá podés ver el estado de cada actividad y trabajo que enviaste.</p>
 
-  <div class="estado">
-    ✅ Actividad 1 — Aprobada  
+    <div id="contenido">
+      <div class="loading">Cargando tus entregas...</div>
+    </div>
   </div>
 
-  <div class="estado">
-    ⏳ Actividad 2 — En revisión  
-  </div>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      "https://yfdiejyrhaaziceyeiuc.supabase.co",
+      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
+    );
 
-  <div class="estado">
-    ❌ Actividad 3 — Falta entregar  
-  </div>
+    function tagClass(estado) {
+      if (estado === "aprobado") return "tag tag--aprobado";
+      if (estado === "corregir") return "tag tag--corregir";
+      return "tag tag--pendiente";
+    }
 
-</div>
+    function tagLabel(estado) {
+      if (estado === "aprobado") return "✅ Aprobado";
+      if (estado === "corregir") return "❌ A corregir";
+      return "⏳ Pendiente";
+    }
 
+    function fechaLinda(fecha) {
+      if (!fecha) return "";
+      return new Date(fecha).toLocaleString("es-AR", {
+        day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    async function cargarEstado() {
+      const contenido = document.getElementById("contenido");
+
+      const { data: userData } = await supabaseClient.auth.getUser();
+
+      if (!userData.user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const email = userData.user.email;
+
+      const { data, error } = await supabaseClient
+        .from("entregas")
+        .select("*")
+        .eq("user_email", email)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        contenido.innerHTML = `<div class="empty">Error cargando entregas: ${error.message}</div>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        contenido.innerHTML = `
+          <div class="empty">
+            <strong>Todavía no enviaste ninguna entrega.</strong><br>
+            Cuando subas una actividad o trabajo final, vas a poder ver el estado acá.
+          </div>`;
+        return;
+      }
+
+      contenido.innerHTML = data.map(e => `
+        <div class="entrega-card">
+          <div class="entrega-top">
+            <div>
+              <div class="entrega-nombre">${e.nombre_entrega || "Entrega"}</div>
+              <div class="entrega-meta">Curso: <strong>${e.curso || "General"}</strong> · Tipo: ${e.tipo || "General"}</div>
+            </div>
+            <span class="${tagClass(e.estado)}">${tagLabel(e.estado)}</span>
+          </div>
+
+          ${e.comentario ? `
+            <div class="comentario">
+              <strong>Comentario del profe:</strong>
+              ${e.comentario}
+            </div>` : ""}
+
+          <div class="fecha">Enviado el ${fechaLinda(e.created_at)}</div>
+        </div>
+      `).join("");
+    }
+
+    cargarEstado();
+  </script>
 </body>
 </html>

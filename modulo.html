@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Módulos | Charly Cursos</title>
 
+  <!-- ✅ FIX 1: Supabase importado correctamente -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root{
       --bg:#070a0f;
@@ -105,6 +108,7 @@
       font-weight:700;
       letter-spacing:.2px;
       cursor:pointer;
+      font-size:14px;
     }
 
     .btn--primary{
@@ -301,6 +305,14 @@
       white-space:nowrap;
     }
 
+    /* ✅ FIX: Botones de acción bien alineados */
+    .lesson-actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:12px;
+    }
+
     .mini-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
@@ -342,8 +354,10 @@
     @media (max-width: 980px){
       .layout{grid-template-columns:1fr}
       .sidebar{position:static}
-      .video-wrap iframe{height:280px}
+      .video-wrap iframe{height:220px}
       .mini-grid{grid-template-columns:1fr}
+      .btn { padding: 10px 14px; font-size: 13px; }
+      .lesson-actions { gap: 8px; }
     }
   </style>
 </head>
@@ -357,7 +371,6 @@
           <small>CURSOS</small>
         </span>
       </a>
-
       <div class="topbar__actions">
         <a class="btn btn--ghost" href="campus.html">Volver al campus</a>
       </div>
@@ -389,6 +402,10 @@
       </aside>
 
       <div class="content">
+
+        <!-- ═══════════════════════════════════════════════
+             CURSO 1 — PERSONAL TRAINER
+        ════════════════════════════════════════════════ -->
         <section class="course" id="personal-trainer">
           <div class="course__top">
             <div class="course__badge">Curso individual</div>
@@ -402,7 +419,7 @@
           <article class="lesson">
             <h3>Clase 1 — Introducción al manual</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/1M6BCJ9EqSs" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/1M6BCJ9EqSs" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://www.youtube.com/watch?v=ncrkEPwVloA" target="_blank">
@@ -418,7 +435,7 @@
           <article class="lesson">
             <h3>Clase 2 — Perfiles y características de entrenadores y clientes</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/wn9LKpsIBt0" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/wn9LKpsIBt0" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://www.youtube.com/watch?v=dpY7Q-2n4xY" target="_blank">
@@ -434,10 +451,10 @@
                   <span>Trabajo práctico complementario.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-            <a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
@@ -445,7 +462,7 @@
             <h3>Clase 3 — Principios del entrenamiento físico</h3>
             <p>Sistemas de entrenamiento, pros y contras.</p>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/SsNtC4dLEFw" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/SsNtC4dLEFw" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://www.youtube.com/watch?v=TaxLxS5KGLs" target="_blank">
@@ -462,17 +479,16 @@
                 </div>
                 <span class="btn resource__btn">Abrir</span>
               </a>
-              
-              <a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 4 — Entrada en calor, contracción muscular y fuerza</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/Pj5bQJ68JWk" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/Pj5bQJ68JWk" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://www.youtube.com/watch?v=Jyzt81_CPTc" target="_blank">
@@ -489,17 +505,16 @@
                 </div>
                 <span class="btn resource__btn">Abrir</span>
               </a>
-            
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 5 — Fitness, potencial lesivo y armado de rutinas</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/4PYbk-eYPpc" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/4PYbk-eYPpc" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://www.youtube.com/watch?v=ZbUvfBLmiLM" target="_blank">
@@ -516,17 +531,16 @@
                 </div>
                 <span class="btn resource__btn">Abrir</span>
               </a>
-              
-              <a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 6 — Marketing</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/IBtisfTcZcY" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/IBtisfTcZcY" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://www.youtube.com/watch?v=kTSCnsbgT3M" target="_blank">
@@ -542,7 +556,7 @@
           <article class="lesson">
             <h3>Clase 7 — Sistemas de entrenamiento: HIIT, EMOM, TABATA, AMRAP</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/K3J1i8BZuzI" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/K3J1i8BZuzI" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1WyLkHrnlFugGyrnefChdy2b5AEZit6QS/view?usp=drive_link" target="_blank">
@@ -552,18 +566,16 @@
                 </div>
                 <span class="btn resource__btn">Abrir</span>
               </a>
-              
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 8 — Stretching y tercera edad</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/ll9qqx-68Ws" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/ll9qqx-68Ws" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1qJf7fSQyraT_2MW0o6zfyqjiutyGXhYD/view?usp=drive_link" target="_blank">
@@ -573,11 +585,9 @@
                 </div>
                 <span class="btn resource__btn">Abrir</span>
               </a>
-            
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
@@ -597,7 +607,7 @@
           <article class="lesson">
             <h3>Clase 10 — Método de intensidad y sistema Weider</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/UWYlsYGDmqc" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/UWYlsYGDmqc" allowfullscreen loading="lazy"></iframe>
             </div>
           </article>
 
@@ -617,21 +627,18 @@
                   <span>Entrega final del instructorado.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar trabajo
-</a>
-
-<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
-  📊 Ver estado / corrección
-</a>
-
-</div>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar trabajo</a>
+              <a class="btn btn--ghost" href="estado.html">📊 Ver estado / corrección</a>
             </div>
           </article>
         </section>
 
+        <!-- ═══════════════════════════════════════════════
+             CURSO 2 — NUTRICIÓN
+        ════════════════════════════════════════════════ -->
         <section class="course" id="nutricion">
           <div class="course__top">
             <div class="course__badge">Curso individual</div>
@@ -657,7 +664,7 @@
           <article class="lesson">
             <h3>Clase 1 — Nutrición y alimentación</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/ZoBp-JlvHHE" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/ZoBp-JlvHHE" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1_Tzm8zTZLOtn3jgNRMDFxkOjtCAfjZiU/view?usp=drive_link" target="_blank">
@@ -680,7 +687,7 @@
           <article class="lesson">
             <h3>Clase 2 — Micronutrientes e hidratación</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/a-pLtVGx_iw" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/a-pLtVGx_iw" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1ocZwbSKu8UU_vlL2bF37fXfJ89FcdJt0/view?usp=drive_link" target="_blank">
@@ -703,19 +710,17 @@
                   <span>Actividad de nutrición.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-            
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 3 — Sistemas energéticos y alimentación aplicada</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/Dh_viHVk6vs" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/Dh_viHVk6vs" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1zfHXRcswJIKldJCvZ2o9uwWTiIIAQPam/view?usp=drive_link" target="_blank">
@@ -736,21 +741,19 @@
                 <div class="resource__left">
                   <strong>Actividad 2</strong>
                   <span>Actividad de nutrición.</span>
-                </div> 
+                </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-            
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 4 — Batch cooking y planificación de menú</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/B7hYx7apoQY" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/B7hYx7apoQY" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1W0i8hya9WyJzv470uDtmoMPDRY6Cs7P-/view?usp=drive_link" target="_blank">
@@ -773,29 +776,18 @@
                   <span>Actividad final de nutrición.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-            
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+              </a>
               <a class="resource" href="https://docs.google.com/document/d/1hXyT5485Lsb3Lzkda6ljfmcmOZGDpaRM/edit?usp=drive_link&ouid=118337418829344810973&rtpof=true&sd=true" target="_blank">
                 <div class="resource__left">
                   <strong>Trabajo final</strong>
                   <span>Evaluación final del curso.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar trabajo
-</a>
-
-<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
-  📊 Ver estado / corrección
-</a>
-
-</div>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar trabajo</a>
+              <a class="btn btn--ghost" href="estado.html">📊 Ver estado / corrección</a>
             </div>
           </article>
 
@@ -827,6 +819,9 @@
           </article>
         </section>
 
+        <!-- ═══════════════════════════════════════════════
+             CURSO 3 — FUNCIONAL Y HIIT
+        ════════════════════════════════════════════════ -->
         <section class="course" id="funcional-hiit">
           <div class="course__top">
             <div class="course__badge">Curso individual</div>
@@ -839,7 +834,7 @@
           <article class="lesson">
             <h3>Clase 1 — Introducción, beneficios y bases</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/04mXYkzHIAs" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/04mXYkzHIAs" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="mini-grid">
               <div class="mini-card">
@@ -856,7 +851,7 @@
           <article class="lesson">
             <h3>Clase 2 — Dónde se hacen las clases y armado de rutinas</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/dxOEP5-H_uQ" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/dxOEP5-H_uQ" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://youtu.be/32uqweReGyM" target="_blank">
@@ -879,22 +874,21 @@
                   <span>Trabajo práctico del módulo.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-              
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 3 — Sistemas de entrenamiento</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/sHwYgrMzpGQ" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/sHwYgrMzpGQ" allowfullscreen loading="lazy"></iframe>
             </div>
           </article>
 
+          <!-- ✅ FIX: HTML roto corregido — recursos y botones dentro del mismo contenedor -->
           <article class="lesson">
             <h3>Clase 4 — Escalera, rounds y manipulación de elementos</h3>
             <div class="resources">
@@ -932,17 +926,7 @@
                   <span>Evaluación final del curso.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar trabajo
-</a>
-
-<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
-  📊 Ver estado / corrección
-</a>
-
-</div>
+              </a>
               <a class="resource" href="https://drive.google.com/file/d/1ttijoVym4lNqWNdmTyqKj7wSlMvHwRc_/view?usp=drive_link" target="_blank">
                 <div class="resource__left">
                   <strong>Manual de estudio</strong>
@@ -951,9 +935,16 @@
                 <span class="btn resource__btn">Abrir</span>
               </a>
             </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar trabajo</a>
+              <a class="btn btn--ghost" href="estado.html">📊 Ver estado / corrección</a>
+            </div>
           </article>
         </section>
 
+        <!-- ═══════════════════════════════════════════════
+             CURSO 4 — MUSCULACIÓN
+        ════════════════════════════════════════════════ -->
         <section class="course" id="musculacion">
           <div class="course__top">
             <div class="course__badge">Curso individual</div>
@@ -966,14 +957,14 @@
           <article class="lesson">
             <h3>Clase 1 — Qué es un instructor de musculación</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/k_CEX3NeV7Q" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/k_CEX3NeV7Q" allowfullscreen loading="lazy"></iframe>
             </div>
           </article>
 
           <article class="lesson">
             <h3>Clase 2 — 10 principios de Weider</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/R8Qj2yZFyko" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/R8Qj2yZFyko" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://youtube.com/shorts/NVJEdgo0zRk" target="_blank">
@@ -1003,12 +994,10 @@
                   <span>Trabajo práctico del módulo.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-            
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar actividad
-</a>
+              </a>
+            </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar actividad</a>
             </div>
           </article>
 
@@ -1039,10 +1028,11 @@
             </div>
           </article>
 
+          <!-- ✅ FIX: HTML roto corregido — todos los recursos dentro del contenedor correcto -->
           <article class="lesson">
             <h3>Clase 4 — Armado de rutinas</h3>
             <div class="video-wrap">
-              <iframe src="https://www.youtube.com/embed/iEpd1xEYlLI" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/iEpd1xEYlLI" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="resources">
               <a class="resource" href="https://drive.google.com/file/d/1pKkgAbMlMxtAn31j6nLQmOZmZs9PC9r6/view?usp=drive_link" target="_blank">
@@ -1058,17 +1048,7 @@
                   <span>Evaluación final del curso.</span>
                 </div>
                 <span class="btn resource__btn">Abrir</span>
-              </a> 
-
-<a class="btn btn--primary" href="entregas.html" style="margin-top:10px; display:inline-block;">
-  📤 Entregar trabajo
-</a>
-
-<a class="btn btn--ghost" href="estado.html" style="margin-top:10px; display:inline-block;">
-  📊 Ver estado / corrección
-</a>
-
-</div>
+              </a>
               <a class="resource" href="https://drive.google.com/file/d/1FVzT1a4yw5kS2UDOxq-Fm0mSHuHELA7g/view?usp=drive_link" target="_blank">
                 <div class="resource__left">
                   <strong>Manual de estudio</strong>
@@ -1084,9 +1064,16 @@
                 <span class="btn resource__btn">Abrir</span>
               </a>
             </div>
+            <div class="lesson-actions">
+              <a class="btn btn--primary" href="entregas.html">📤 Entregar trabajo</a>
+              <a class="btn btn--ghost" href="estado.html">📊 Ver estado / corrección</a>
+            </div>
           </article>
         </section>
 
+        <!-- ═══════════════════════════════════════════════
+             PACK COMPLETO
+        ════════════════════════════════════════════════ -->
         <section class="course" id="pack-completo">
           <div class="course__top">
             <div class="course__badge">Plan recomendado</div>
@@ -1121,126 +1108,114 @@
             Después podés hacer que el alumno vea todo este contenido desde un solo acceso.
           </div>
         </section>
+
       </div>
     </section>
   </main>
 
+  <!-- ✅ FIX: Un solo DOMContentLoaded, Supabase correctamente inicializado -->
   <script>
+    const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
+    const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
     function aplicarFiltroPlan() {
       const plan = localStorage.getItem("plan");
 
       const secciones = {
-        personal: document.getElementById("personal-trainer"),
-        nutricion: document.getElementById("nutricion"),
-        hiit: document.getElementById("funcional-hiit"),
+        personal:    document.getElementById("personal-trainer"),
+        nutricion:   document.getElementById("nutricion"),
+        hiit:        document.getElementById("funcional-hiit"),
         musculacion: document.getElementById("musculacion"),
-        completo: document.getElementById("pack-completo")
+        completo:    document.getElementById("pack-completo")
       };
 
       const navLinks = {
-        personal: document.querySelector('a[href="#personal-trainer"]'),
-        nutricion: document.querySelector('a[href="#nutricion"]'),
-        hiit: document.querySelector('a[href="#funcional-hiit"]'),
+        personal:    document.querySelector('a[href="#personal-trainer"]'),
+        nutricion:   document.querySelector('a[href="#nutricion"]'),
+        hiit:        document.querySelector('a[href="#funcional-hiit"]'),
         musculacion: document.querySelector('a[href="#musculacion"]'),
-        completo: document.querySelector('a[href="#pack-completo"]')
+        completo:    document.querySelector('a[href="#pack-completo"]')
       };
 
-      Object.values(secciones).forEach(sec => {
-        if (sec) sec.style.display = "none";
-      });
-
-      Object.values(navLinks).forEach(link => {
-        if (link) link.style.display = "none";
-      });
+      // Ocultar todo primero
+      Object.values(secciones).forEach(sec  => { if (sec)  sec.style.display  = "none"; });
+      Object.values(navLinks).forEach(link => { if (link) link.style.display = "none"; });
 
       if (plan === "completo") {
-        Object.values(secciones).forEach(sec => {
-          if (sec) sec.style.display = "block";
-        });
-        Object.values(navLinks).forEach(link => {
-          if (link) link.style.display = "block";
-        });
+        Object.values(secciones).forEach(sec  => { if (sec)  sec.style.display  = "block"; });
+        Object.values(navLinks).forEach(link => { if (link) link.style.display = "block"; });
         return;
       }
 
-      if (secciones[plan]) {
-        secciones[plan].style.display = "block";
+      if (secciones[plan])  secciones[plan].style.display  = "block";
+      if (navLinks[plan])   navLinks[plan].style.display   = "block";
+    }
+
+    async function aplicarBloqueoReal() {
+      const { data: userData } = await supabaseClient.auth.getUser();
+
+      if (!userData.user) {
+        window.location.href = "login.html";
+        return;
       }
 
-      if (navLinks[plan]) {
-        navLinks[plan].style.display = "block";
+      const email = userData.user.email;
+
+      const cursos = [
+        { id: "personal-trainer", key: "personal" },
+        { id: "nutricion",        key: "nutricion" },
+        { id: "funcional-hiit",   key: "hiit" },
+        { id: "musculacion",      key: "musculacion" }
+      ];
+
+      for (const curso of cursos) {
+        const seccion = document.getElementById(curso.id);
+        if (!seccion) continue;
+
+        const { data: progreso } = await supabaseClient
+          .from("progreso_alumnos")
+          .select("clase_actual")
+          .eq("user_email", email)
+          .eq("curso", curso.key)
+          .maybeSingle();
+
+        const clasePermitida = progreso?.clase_actual || 1;
+        const clases = seccion.querySelectorAll(".lesson");
+
+        clases.forEach((clase, index) => {
+          const numeroClase = index + 1;
+
+          if (numeroClase > clasePermitida) {
+            clase.style.opacity       = "0.35";
+            clase.style.pointerEvents = "none";
+            clase.style.filter        = "grayscale(1)";
+
+            if (!clase.querySelector(".bloqueo-aviso")) {
+              const aviso = document.createElement("div");
+              aviso.className  = "bloqueo-aviso";
+              aviso.innerText  = "🔒 Clase bloqueada — se habilita al completar la etapa anterior.";
+              aviso.style.cssText = `
+                margin-top:12px;
+                padding:12px;
+                border-radius:14px;
+                background:rgba(255,255,255,.08);
+                border:1px solid rgba(255,255,255,.12);
+                color:rgba(255,255,255,.78);
+                font-weight:700;
+              `;
+              clase.appendChild(aviso);
+            }
+          }
+        });
       }
     }
 
-    document.addEventListener("DOMContentLoaded", aplicarFiltroPlan);
-  </script>
-<script>
-const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
-const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-async function aplicarBloqueoReal() {
-  const { data: userData } = await supabase.auth.getUser();
-
-  if (!userData.user) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  const email = userData.user.email;
-
-  const cursos = [
-    { id: "personal-trainer", key: "personal" },
-    { id: "nutricion", key: "nutricion" },
-    { id: "funcional-hiit", key: "hiit" },
-    { id: "musculacion", key: "musculacion" }
-  ];
-
-  for (const curso of cursos) {
-    const seccion = document.getElementById(curso.id);
-    if (!seccion) continue;
-
-    const { data: progreso } = await supabase
-      .from("progreso_alumnos")
-      .select("clase_actual")
-      .eq("user_email", email)
-      .eq("curso", curso.key)
-      .maybeSingle();
-
-    const clasePermitida = progreso?.clase_actual || 1;
-    const clases = seccion.querySelectorAll(".lesson");
-
-    clases.forEach((clase, index) => {
-      const numeroClase = index + 1;
-
-      if (numeroClase > clasePermitida) {
-        clase.style.opacity = "0.35";
-        clase.style.pointerEvents = "none";
-        clase.style.filter = "grayscale(1)";
-
-        if (!clase.querySelector(".bloqueo-aviso")) {
-          const aviso = document.createElement("div");
-          aviso.className = "bloqueo-aviso";
-          aviso.innerText = "🔒 Clase bloqueada — se habilita al completar la etapa anterior.";
-          aviso.style.marginTop = "12px";
-          aviso.style.padding = "12px";
-          aviso.style.borderRadius = "14px";
-          aviso.style.background = "rgba(255,255,255,.08)";
-          aviso.style.border = "1px solid rgba(255,255,255,.12)";
-          aviso.style.color = "rgba(255,255,255,.78)";
-          aviso.style.fontWeight = "700";
-
-          clase.appendChild(aviso);
-        }
-      }
+    // ✅ Un solo DOMContentLoaded que llama a ambas funciones
+    document.addEventListener("DOMContentLoaded", () => {
+      aplicarFiltroPlan();
+      aplicarBloqueoReal();
     });
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  aplicarFiltroPlan();
-  aplicarBloqueoReal();
-});
-</script>
+  </script>
 </body>
 </html>

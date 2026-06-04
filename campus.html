@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campus | Charly Cursos</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
@@ -35,498 +34,362 @@
     .container{width:min(var(--container),92%);margin:0 auto}
 
     .topbar{
-      position:sticky;top:0;z-index:50;
+      position:sticky;
+      top:0;
+      z-index:50;
       background:rgba(7,10,15,.7);
       backdrop-filter:blur(10px);
       border-bottom:1px solid rgba(255,255,255,.08);
     }
 
     .topbar__inner{
-      display:flex;align-items:center;
+      display:flex;
+      align-items:center;
       justify-content:space-between;
-      gap:14px;padding:14px 0;
+      gap:14px;
+      padding:14px 0;
     }
 
-    .brand{display:flex;align-items:center;gap:10px;min-width:180px}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:180px;
+    }
 
     .brand__mark{
-      width:40px;height:40px;border-radius:12px;
-      display:grid;place-items:center;font-weight:900;
-      background:linear-gradient(135deg,rgba(96,214,255,.22),rgba(90,107,255,.18));
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      background:linear-gradient(135deg, rgba(96,214,255,.22), rgba(90,107,255,.18));
       border:1px solid rgba(255,255,255,.10);
     }
 
-    .brand__text strong{display:block;line-height:1;letter-spacing:.8px}
-    .brand__text small{display:block;color:rgba(255,255,255,.55);letter-spacing:3px;font-size:10px;margin-top:4px}
+    .brand__text strong{
+      display:block;
+      line-height:1;
+      letter-spacing:.8px;
+    }
 
-    .topbar__actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .brand__text small{
+      display:block;
+      color:rgba(255,255,255,.55);
+      letter-spacing:3px;
+      font-size:10px;
+      margin-top:4px;
+    }
+
+    .topbar__actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
     .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      gap:.5rem;padding:12px 16px;border-radius:999px;
-      border:1px solid var(--stroke);background:rgba(255,255,255,.06);
-      color:var(--text);font-weight:700;letter-spacing:.2px;cursor:pointer;
-      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      padding:12px 16px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      letter-spacing:.2px;
+      cursor:pointer;
     }
 
     .btn--primary{
       border-color:rgba(96,214,255,.25);
-      background:linear-gradient(135deg,rgba(96,214,255,.22),rgba(90,107,255,.18));
+      background:linear-gradient(135deg, rgba(96,214,255,.22), rgba(90,107,255,.18));
     }
 
-    .btn--ghost{background:transparent}
+    .btn--ghost{
+      background:transparent;
+    }
 
-    .hero{padding:34px 0 18px}
+    .hero{
+      padding:34px 0 18px;
+    }
 
     .hero__grid{
       display:grid;
       grid-template-columns:1.05fr .95fr;
-      gap:24px;align-items:start;
+      gap:24px;
+      align-items:start;
     }
 
     .pill{
-      display:inline-flex;align-items:center;gap:10px;
-      padding:10px 14px;border-radius:999px;
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-      color:rgba(255,255,255,.72);margin:0 0 14px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.72);
+      margin:0 0 14px;
     }
 
-    h1{margin:0 0 12px;font-size:clamp(30px,4vw,48px);line-height:1.05;letter-spacing:-0.8px}
+    h1{
+      margin:0 0 12px;
+      font-size:clamp(30px,4vw,48px);
+      line-height:1.05;
+      letter-spacing:-0.8px;
+    }
 
     .accent{
-      background:linear-gradient(90deg,var(--accent),rgba(90,107,255,.9));
-      -webkit-background-clip:text;background-clip:text;color:transparent;
+      background:linear-gradient(90deg, var(--accent), rgba(90,107,255,.9));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
     }
 
-    .subtitle{margin:0 0 18px;color:rgba(255,255,255,.72);font-size:16px;line-height:1.6;max-width:60ch}
+    .subtitle{
+      margin:0 0 18px;
+      color:rgba(255,255,255,.72);
+      font-size:16px;
+      line-height:1.6;
+      max-width:60ch;
+    }
 
-    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+      margin-top:18px;
+    }
 
     .stat{
-      background:var(--panel);border:1px solid rgba(255,255,255,.08);
-      border-radius:18px;padding:14px;
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:14px;
     }
 
-    .stat strong{display:block;font-size:22px;margin-bottom:4px}
-    .stat span{color:var(--muted);font-size:14px;line-height:1.45}
+    .stat strong{
+      display:block;
+      font-size:22px;
+      margin-bottom:4px;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
 
     .panel{
-      background:var(--panel);border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;padding:16px;box-shadow:var(--shadow);
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:16px;
+      box-shadow:var(--shadow);
     }
 
-    .panel h2{margin:0 0 8px;font-size:24px}
-    .panel p{margin:0 0 16px;color:var(--muted);line-height:1.6}
+    .panel h2{
+      margin:0 0 8px;
+      font-size:24px;
+    }
 
-    .progress{margin:14px 0 18px}
+    .panel p{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .progress{
+      margin:14px 0 18px;
+    }
 
     .progress__top{
-      display:flex;justify-content:space-between;gap:10px;
-      margin-bottom:8px;font-size:14px;color:rgba(255,255,255,.78);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+      font-size:14px;
+      color:rgba(255,255,255,.78);
     }
 
     .progress__bar{
-      height:12px;border-radius:999px;
-      background:rgba(255,255,255,.08);overflow:hidden;
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
       border:1px solid rgba(255,255,255,.06);
     }
 
     .progress__fill{
+      width:16%;
       height:100%;
-      background:linear-gradient(90deg,var(--accent),var(--accent2));
-      transition:width .6s ease;
+      background:linear-gradient(90deg, var(--accent), var(--accent2));
     }
 
-    .section{padding:12px 0 34px}
+    .section{
+      padding:12px 0 34px;
+    }
 
-    .section__head{margin-bottom:16px}
+    .section__head{
+      margin-bottom:16px;
+    }
 
-    .section__head h2{margin:0 0 8px;font-size:clamp(22px,2.4vw,30px);letter-spacing:-0.4px}
+    .section__head h2{
+      margin:0 0 8px;
+      font-size:clamp(22px,2.4vw,30px);
+      letter-spacing:-0.4px;
+    }
 
-    .section__head p{margin:0;color:var(--muted);line-height:1.6;max-width:72ch}
+    .section__head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+      max-width:72ch;
+    }
 
-    .modules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .modules{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
 
     .module-card{
-      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
-      border-radius:20px;padding:16px;position:relative;overflow:hidden;
-    }
-
-    .module-card--active{border-color:rgba(96,214,255,.24);box-shadow:0 10px 30px rgba(0,0,0,.18)}
-    .module-card--locked{opacity:.72}
-
-    .module-badge{
-      display:inline-flex;align-items:center;padding:8px 10px;
-      border-radius:999px;background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.74);
-      font-size:12px;font-weight:800;margin-bottom:12px;
-    }
-
-    .module-card h3{margin:0 0 6px;font-size:20px}
-    .module-card p{margin:0 0 14px;color:var(--muted);line-height:1.55;min-height:72px}
-
-    .module-meta{display:grid;gap:8px;margin-bottom:16px}
-    .module-meta span{color:rgba(255,255,255,.72);font-size:14px}
-
-    .module-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .module-lock{position:absolute;top:14px;right:14px;font-size:13px;color:rgba(255,255,255,.58)}
-
-    .notice{
-      margin-top:18px;background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);border-radius:18px;
-      padding:14px;color:var(--muted);line-height:1.6;
-    }
-
-    .notice strong{color:var(--text)}
-
-    #user-email{margin-top:10px;color:rgba(255,255,255,.78);font-size:14px}
-    #plan-name{margin-top:8px;color:#8be9ff;font-size:15px;font-weight:700}
-
-    /* Progreso por curso */
-    .progreso-cursos{
-      display:grid;gap:10px;
-      margin-top:14px;
-    }
-
-    .progreso-item{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:12px;flex-wrap:wrap;
       background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;padding:10px 14px;
+      border-radius:20px;
+      padding:16px;
+      position:relative;
+      overflow:hidden;
     }
 
-    .progreso-item__nombre{font-size:14px;font-weight:700}
-
-    .progreso-item__bar-wrap{
-      flex:1;min-width:100px;
-      height:8px;border-radius:999px;
-      background:rgba(255,255,255,.08);overflow:hidden;
+    .module-card--active{
+      border-color:rgba(96,214,255,.24);
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
     }
 
-    .progreso-item__bar{
-      height:100%;
-      background:linear-gradient(90deg,var(--accent),var(--accent2));
-      transition:width .5s ease;
+    .module-card--locked{
+      opacity:.72;
     }
 
-    .progreso-item__pct{
-      font-size:13px;font-weight:800;
-      color:var(--accent);
-      min-width:36px;text-align:right;
+    .module-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.74);
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:12px;
     }
 
-    @media (max-width:980px){
+    .module-card h3{
+      margin:0 0 6px;
+      font-size:20px;
+    }
+
+    .module-card p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.55;
+      min-height:72px;
+    }
+
+    .module-meta{
+      display:grid;
+      gap:8px;
+      margin-bottom:16px;
+    }
+
+    .module-meta span{
+      color:rgba(255,255,255,.72);
+      font-size:14px;
+    }
+
+    .module-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .module-lock{
+      position:absolute;
+      top:14px;
+      right:14px;
+      font-size:13px;
+      color:rgba(255,255,255,.58);
+    }
+
+    .notice{
+      margin-top:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:14px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .notice strong{
+      color:var(--text);
+    }
+
+    #user-email{
+      margin-top:10px;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+    }
+
+    @media (max-width: 980px){
       .hero__grid{grid-template-columns:1fr}
       .stats{grid-template-columns:1fr}
-      .modules{grid-template-columns:1fr}
-    }
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <div class="container topbar__inner">
-      <a class="brand" href="index.html" aria-label="Charly Cursos">
-        <span class="brand__mark">C</span>
-        <span class="brand__text">
-          <strong>CHARLY</strong>
-          <small>CURSOS</small>
-        </span>
-      </a>
-      <div class="topbar__actions">
-        <a class="btn btn--ghost" href="index.html">Inicio</a>
-        <button class="btn btn--primary" onclick="logout()">Cerrar sesión</button>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="container hero__grid">
-        <div>
-          <p class="pill">Campus privado del alumno</p>
-          <h1>Bienvenido al <span class="accent">campus</span></h1>
-          <p class="subtitle" id="plan-description">
+@@ -376,6 +382,7 @@
+          <p class="subtitle">
             Acá vas a encontrar tus etapas, clases, materiales, evaluaciones y el avance completo del programa.
           </p>
           <div id="user-email"></div>
-          <div id="plan-name"></div>
 
           <div class="stats">
             <div class="stat">
-              <strong id="stat-access">Acceso activo</strong>
-              <span id="stat-access-text">Tu cuenta ya está habilitada para comenzar.</span>
-            </div>
-            <div class="stat">
-              <strong>24/7</strong>
-              <span>Acceso desde cualquier dispositivo, cuando quieras.</span>
-            </div>
-            <div class="stat">
-              <strong>Certificación</strong>
-              <span>Al completar el recorrido y aprobar las evaluaciones.</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h2>Tu progreso</h2>
-          <p id="progreso-descripcion">Cargando tu avance...</p>
-
-          <div class="progress">
-            <div class="progress__top">
-              <span>Avance total</span>
-              <span id="pct-total">—</span>
-            </div>
-            <div class="progress__bar">
-              <div class="progress__fill" id="barra-total" style="width:0%"></div>
-            </div>
+@@ -408,7 +415,7 @@
           </div>
 
-          <div class="progreso-cursos" id="progreso-cursos"></div>
-
-          <div class="notice" id="notice-box">
-            <strong>Estado:</strong> cargando información de tu cuenta...
+          <div class="notice">
+            <strong>Estado:</strong> tenés habilitada la primera etapa.  
+            <strong>Estado:</strong> tenés habilitada la primera etapa.
+            Las demás quedan listas para conectarlas con la lógica real del curso.
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section__head">
-          <h2>Tu acceso actual</h2>
-          <p id="modules-description">Entrá al contenido disponible según el plan que elegiste.</p>
-        </div>
-
-        <div class="modules">
-          <article class="module-card module-card--active">
-            <span class="module-badge" id="main-badge">Módulo principal</span>
-            <h3 id="main-title">Acceder al contenido</h3>
-            <p id="main-text">Entrá al contenido disponible según el plan que elegiste.</p>
-
-            <div class="module-meta" id="main-meta">
-              <span>• Videos y materiales</span>
-              <span>• Actividades prácticas</span>
-              <span>• Acceso disponible</span>
-            </div>
-
-            <div class="module-actions">
-              <a class="btn btn--primary" href="modulo.html" id="main-button">Entrar al módulo</a>
-            </div>
-          </article>
-
-          <article class="module-card module-card--locked">
-            <span class="module-lock">Próximamente</span>
-            <span class="module-badge">Más contenido</span>
-            <h3>Expansión del campus</h3>
-            <p>Después podemos conectar más módulos, evaluaciones, certificados y progreso real por plan.</p>
-            <div class="module-meta">
-              <span>• Evaluaciones</span>
-              <span>• Certificación</span>
-              <span>• Desbloqueos</span>
-            </div>
-            <div class="module-actions">
-              <button class="btn" type="button">En desarrollo</button>
-            </div>
-          </article>
-
-          <article class="module-card module-card--locked">
-            <span class="module-lock">Próximamente</span>
-            <span class="module-badge">Automatización</span>
-            <h3>Pagos y acceso real</h3>
-            <p>La próxima etapa es conectar pagos, acceso automático y contenido filtrado por cada plan.</p>
-            <div class="module-meta">
-              <span>• MercadoPago</span>
-              <span>• Acceso por compra</span>
-              <span>• Planes dinámicos</span>
-            </div>
-            <div class="module-actions">
-              <button class="btn" type="button">En desarrollo</button>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-  </main>
-
+@@ -532,22 +539,24 @@
   <script>
     const supabaseClient = window.supabase.createClient(
       "https://yfdiejyrhaaziceyeiuc.supabase.co",
+      "sb_publishable_frXqVXDILy3hgUFvp341pA_qqZdcQ_d"
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZGllanlyaGFhemljZXllaXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjc3OTcsImV4cCI6MjA5MTg0Mzc5N30.Rx3hOr-oMa1geUkpsLyxsRpQ1ilmJnEol7xTRwzgZAc"
     );
 
-    // Clases máximas por curso
-    const MAX_CLASES = {
-      personal: 10,
-      nutricion: 4,
-      hiit: 4,
-      musculacion: 4
-    };
-
-    const NOMBRES_CURSO = {
-      personal: "Personal Trainer",
-      nutricion: "Nutrición",
-      hiit: "Funcional & HIIT",
-      musculacion: "Musculación"
-    };
-
-    function formatPlanName(plan) {
-      const names = {
-        completo: "Pack Completo",
-        personal: "Personal Trainer",
-        hiit: "Funcional & HIIT",
-        musculacion: "Musculación",
-        nutricion: "Nutrición deportiva"
-      };
-      return names[plan] || "Sin plan definido";
-    }
-
-    function applyPlanContent(plan) {
-      const planName      = document.getElementById("plan-name");
-      const planDesc      = document.getElementById("plan-description");
-      const statAccess    = document.getElementById("stat-access");
-      const statAccessTxt = document.getElementById("stat-access-text");
-      const noticeBox     = document.getElementById("notice-box");
-      const modulesDesc   = document.getElementById("modules-description");
-      const mainBadge     = document.getElementById("main-badge");
-      const mainTitle     = document.getElementById("main-title");
-      const mainText      = document.getElementById("main-text");
-      const mainButton    = document.getElementById("main-button");
-
-      planName.innerText = "Plan: " + formatPlanName(plan);
-
-      if (plan === "completo") {
-        planDesc.innerText    = "Tenés acceso al pack completo con todas las formaciones.";
-        statAccess.innerText  = "Acceso total";
-        statAccessTxt.innerText = "Tu cuenta tiene habilitadas todas las áreas.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> tenés acceso al pack completo.";
-        modulesDesc.innerText = "Desde acá podés entrar a todas las formaciones.";
-        mainBadge.innerText   = "Pack completo activo";
-        mainTitle.innerText   = "Entrar al contenido completo";
-        mainText.innerText    = "Accedé a Personal Trainer, Nutrición, Funcional & HIIT y Musculación.";
-      } else if (plan === "personal") {
-        planDesc.innerText    = "Tenés acceso al curso de Personal Trainer.";
-        statAccess.innerText  = "Acceso individual";
-        statAccessTxt.innerText = "Tu cuenta está habilitada para Personal Trainer.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> tenés habilitado el curso de Personal Trainer.";
-        modulesDesc.innerText = "Tu acceso corresponde al curso de Personal Trainer.";
-        mainBadge.innerText   = "Curso activo";
-        mainTitle.innerText   = "Entrar a Personal Trainer";
-        mainText.innerText    = "Accedé al contenido, clases, actividades y materiales.";
-      } else if (plan === "hiit") {
-        planDesc.innerText    = "Tenés acceso al curso de Funcional & HIIT.";
-        statAccess.innerText  = "Acceso individual";
-        statAccessTxt.innerText = "Tu cuenta está habilitada para Funcional & HIIT.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> tenés habilitado Funcional & HIIT.";
-        modulesDesc.innerText = "Tu acceso corresponde al curso de Funcional & HIIT.";
-        mainBadge.innerText   = "Curso activo";
-        mainTitle.innerText   = "Entrar a Funcional & HIIT";
-        mainText.innerText    = "Accedé al contenido, clases, rutinas y materiales.";
-      } else if (plan === "musculacion") {
-        planDesc.innerText    = "Tenés acceso al curso de Musculación.";
-        statAccess.innerText  = "Acceso individual";
-        statAccessTxt.innerText = "Tu cuenta está habilitada para Musculación.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> tenés habilitado Musculación.";
-        modulesDesc.innerText = "Tu acceso corresponde al curso de Musculación.";
-        mainBadge.innerText   = "Curso activo";
-        mainTitle.innerText   = "Entrar a Musculación";
-        mainText.innerText    = "Accedé al contenido, técnica, rutinas y materiales.";
-      } else if (plan === "nutricion") {
-        planDesc.innerText    = "Tenés acceso al curso de Nutrición deportiva.";
-        statAccess.innerText  = "Acceso individual";
-        statAccessTxt.innerText = "Tu cuenta está habilitada para Nutrición deportiva.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> tenés habilitado Nutrición deportiva.";
-        modulesDesc.innerText = "Tu acceso corresponde al curso de Nutrición deportiva.";
-        mainBadge.innerText   = "Curso activo";
-        mainTitle.innerText   = "Entrar a Nutrición deportiva";
-        mainText.innerText    = "Accedé al contenido, materiales y actividades.";
-      } else {
-        planDesc.innerText    = "Todavía no hay un plan definido.";
-        statAccess.innerText  = "Sin plan";
-        statAccessTxt.innerText = "Seleccioná primero una opción de acceso.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> todavía no seleccionaste ningún plan.";
-        modulesDesc.innerText = "Para continuar, elegí un plan.";
-        mainBadge.innerText   = "Pendiente";
-        mainTitle.innerText   = "Elegí un plan";
-        mainText.innerText    = "Primero necesitás seleccionar una formación.";
-        mainButton.setAttribute("href", "planes.html");
-        mainButton.innerText  = "Ir a planes";
-      }
-    }
-
-    async function cargarProgreso(email, plan) {
-      const cursos = plan === "completo"
-        ? ["personal", "nutricion", "hiit", "musculacion"]
-        : (plan ? [plan] : []);
-
-      if (cursos.length === 0) {
-        document.getElementById("progreso-descripcion").innerText = "Elegí un plan para ver tu progreso.";
-        document.getElementById("pct-total").innerText = "0%";
-        return;
-      }
-
-      let totalClases = 0;
-      let totalDesbloqueadas = 0;
-      const contenedor = document.getElementById("progreso-cursos");
-      contenedor.innerHTML = "";
-
-      for (const curso of cursos) {
-        const max = MAX_CLASES[curso] || 1;
-        totalClases += max;
-
-        const { data } = await supabaseClient
-          .from("progreso_alumnos")
-          .select("clase_actual")
-          .eq("user_email", email)
-          .eq("curso", curso)
-          .maybeSingle();
-
-        const claseActual = data?.clase_actual || 1;
-        totalDesbloqueadas += claseActual;
-
-        const pct = Math.round((claseActual / max) * 100);
-
-        const item = document.createElement("div");
-        item.className = "progreso-item";
-        item.innerHTML = `
-          <div class="progreso-item__nombre">${NOMBRES_CURSO[curso]}</div>
-          <div class="progreso-item__bar-wrap">
-            <div class="progreso-item__bar" style="width:${pct}%"></div>
-          </div>
-          <div class="progreso-item__pct">${pct}%</div>
-        `;
-        contenedor.appendChild(item);
-      }
-
-      const pctTotal = Math.round((totalDesbloqueadas / totalClases) * 100);
-      document.getElementById("pct-total").innerText = pctTotal + "%";
-      document.getElementById("barra-total").style.width = pctTotal + "%";
-      document.getElementById("progreso-descripcion").innerText = "Tu avance actual en el campus.";
-    }
-
     async function checkUser() {
+      const { data, error } = await supabaseClient.auth.getUser();
       const { data: { session } } = await supabaseClient.auth.getSession();
 
+      if (error || !data.user) {
       if (!session) {
         window.location.href = "login.html";
-        return;
+      } else {
+        document.getElementById("user-email").innerText = "Sesión iniciada: " + session.user.email;
       }
-
-      const email = session.user.email;
-      document.getElementById("user-email").innerText = "Sesión: " + email;
-
-      const plan = localStorage.getItem("plan");
-      applyPlanContent(plan);
-      await cargarProgreso(email, plan);
     }
 
     async function logout() {
       await supabaseClient.auth.signOut();
-      localStorage.removeItem("plan");
       window.location.href = "login.html";
     }
 
     checkUser();
   </script>
 </body>
-</html>

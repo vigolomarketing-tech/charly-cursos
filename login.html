@@ -134,7 +134,7 @@
   <script>
     const supabaseClient = window.supabase.createClient(
       "https://yfdiejyrhaaziceyeiuc.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZGllanlyaGFhemljZXllaXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNjc3OTcsImV4cCI6MjA5MTg0Mzc5N30.Rx3hOr-oMa1geUkpsLyxsRpQ1ilmJnEol7xTRwzgZAc"
+      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
     );
 
     const messageBox = document.getElementById("messageBox");
@@ -161,7 +161,7 @@
         return;
       }
 
-      const { error } = await supabaseClient.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email: email,
         password: password,
         options: {
@@ -174,6 +174,8 @@
 
       if (error) {
         showMessage("Error: " + error.message, true);
+      } else if (!data.session) {
+        showMessage("Cuenta creada. Revisá tu email para confirmar la cuenta antes de ingresar.");
       } else {
         showMessage("Cuenta creada correctamente. Ahora podés iniciar sesión.");
       }

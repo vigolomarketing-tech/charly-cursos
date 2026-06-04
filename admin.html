@@ -67,7 +67,7 @@ async function protegerAdmin() {
     return false;
   }
 
-  if (data.user.email !== ADMIN_EMAIL) {
+  if ((data.user.email || "").toLowerCase() !== ADMIN_EMAIL) {
     alert("No tenés permisos para entrar al panel.");
     window.location.href = "campus.html";
     return false;
@@ -84,6 +84,12 @@ function estadoClase(estado){
 
 function fechaLinda(fecha){
   return fecha ? new Date(fecha).toLocaleString("es-AR") : "";
+}
+
+function escapeHtml(valor){
+  return String(valor ?? "").replace(/[&<>"']/g, caracter => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  })[caracter]);
 }
 
 function cursoKey(curso){
@@ -127,14 +133,13 @@ async function cargarEntregas(){
     card.innerHTML = `
       <div class="card-top">
         <div>
-          <h3>${entrega.nombre || "Alumno sin nombre"}</h3>
-          <div class="muted">${entrega.user_email || "Sin email"}</div>
-          <div class="muted">Curso: <strong>${entrega.curso || "Sin curso"}</strong></div>
-          <div class="muted">Entrega: <strong>${entrega.nombre_entrega || "General"}</strong></div>
-          <div class="muted">Tipo: <strong>${entrega.tipo || "General"}</strong></div>
+          <h3>${escapeHtml(entrega.nombre || "Alumno sin nombre")}</h3>
+          <div class="muted">${escapeHtml(entrega.user_email || "Sin email")}</div>
+          <div class="muted">Curso: <strong>${escapeHtml(entrega.curso || "Sin curso")}</strong></div>
+          <div class="muted">Detalle: <strong>${escapeHtml(entrega.comentario || "Entrega general")}</strong></div>
           <div class="muted">Fecha: ${fechaLinda(entrega.created_at)}</div>
         </div>
-        <span class="${estadoClase(entrega.estado)}">${entrega.estado || "pendiente"}</span>
+        <span class="${estadoClase(entrega.estado)}">${escapeHtml(entrega.estado || "pendiente")}</span>
       </div>
 
       <div class="actions">
@@ -163,7 +168,7 @@ async function cargarEntregas(){
         </button>
       </div>
 
-      <textarea id="comentario-${entrega.id}" placeholder="Comentario para el alumno...">${entrega.comentario || ""}</textarea>
+      <textarea id="comentario-${entrega.id}" placeholder="Comentario para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
 
       <div class="actions">
         <button class="btn" onclick="guardarComentario('${entrega.id}')">Guardar comentario</button>
@@ -208,16 +213,34 @@ async function aprobarYDesbloquear(id, email, curso){
     return;
   }
 
-  const { error: progresoError } = await supabase
+  const { data: progresoExistente, error: consultaError } = await supabase
     .from("progreso_alumnos")
-    .upsert({
-      user_email: email,
-      curso: cursoNormalizado,
-      clase_actual: clase,
-      updated_at: new Date().toISOString()
-    }, {
-      onConflict: "user_email,curso"
-    });
+    .select("user_email")
+    .eq("user_email", email)
+    .eq("curso", cursoNormalizado)
+    .limit(1);
+
+  if(consultaError){
+    alert("Entrega aprobada, pero error consultando progreso: " + consultaError.message);
+    return;
+  }
+
+  const progresoQuery = progresoExistente && progresoExistente.length
+    ? supabase
+        .from("progreso_alumnos")
+        .update({ clase_actual: clase, updated_at: new Date().toISOString() })
+        .eq("user_email", email)
+        .eq("curso", cursoNormalizado)
+    : supabase
+        .from("progreso_alumnos")
+        .insert({
+          user_email: email,
+          curso: cursoNormalizado,
+          clase_actual: clase,
+          updated_at: new Date().toISOString()
+        });
+
+  const { error: progresoError } = await progresoQuery;
 
   if(progresoError){
     alert("Entrega aprobada, pero error desbloqueando clase: " + progresoError.message);

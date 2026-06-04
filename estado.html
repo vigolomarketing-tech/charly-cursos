@@ -210,6 +210,12 @@
       });
     }
 
+    function escapeHtml(valor) {
+      return String(valor ?? "").replace(/[&<>"']/g, caracter => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      })[caracter]);
+    }
+
     async function cargarEstado() {
       const contenido = document.getElementById("contenido");
 
@@ -246,16 +252,16 @@
         <div class="entrega-card">
           <div class="entrega-top">
             <div>
-              <div class="entrega-nombre">${e.nombre_entrega || "Entrega"}</div>
-              <div class="entrega-meta">Curso: <strong>${e.curso || "General"}</strong> · Tipo: ${e.tipo || "General"}</div>
+              <div class="entrega-nombre">Entrega</div>
+              <div class="entrega-meta">Curso: <strong>${escapeHtml(e.curso || "General")}</strong></div>
             </div>
             <span class="${tagClass(e.estado)}">${tagLabel(e.estado)}</span>
           </div>
 
           ${e.comentario ? `
             <div class="comentario">
-              <strong>Comentario del profe:</strong>
-              ${e.comentario}
+              <strong>Detalle / comentario:</strong>
+              ${escapeHtml(e.comentario)}
             </div>` : ""}
 
           <div class="fecha">Enviado el ${fechaLinda(e.created_at)}</div>

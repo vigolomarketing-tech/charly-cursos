@@ -1117,10 +1117,16 @@
   <script>
     const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
     const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     function aplicarFiltroPlan() {
       const plan = localStorage.getItem("plan");
+      const planesValidos = ["personal", "nutricion", "hiit", "musculacion", "completo"];
+
+      if (!planesValidos.includes(plan)) {
+        window.location.href = "planes.html";
+        return false;
+      }
 
       const secciones = {
         personal:    document.getElementById("personal-trainer"),
@@ -1145,22 +1151,21 @@
       if (plan === "completo") {
         Object.values(secciones).forEach(sec  => { if (sec)  sec.style.display  = "block"; });
         Object.values(navLinks).forEach(link => { if (link) link.style.display = "block"; });
-        return;
+        return true;
       }
 
       if (secciones[plan])  secciones[plan].style.display  = "block";
       if (navLinks[plan])   navLinks[plan].style.display   = "block";
+      return true;
     }
 
-    async function aplicarBloqueoReal() {
-      const { data: userData } = await supabaseClient.auth.getUser();
-
-      if (!userData.user) {
+    async function aplicarBloqueoReal(user) {
+      if (!user) {
         window.location.href = "login.html";
         return;
       }
 
-      const email = userData.user.email;
+      const email = user.email;
 
       const cursos = [
         { id: "personal-trainer", key: "personal" },
@@ -1173,14 +1178,16 @@
         const seccion = document.getElementById(curso.id);
         if (!seccion) continue;
 
-        const { data: progreso } = await supabaseClient
+        const { data: progreso, error } = await supabaseClient
           .from("progreso_alumnos")
           .select("clase_actual")
           .eq("user_email", email)
           .eq("curso", curso.key)
           .maybeSingle();
 
-        const clasePermitida = progreso?.clase_actual || 1;
+        if (error) console.error("No se pudo cargar el progreso de " + curso.key, error);
+
+        const clasePermitida = Math.max(Number(progreso?.clase_actual) || 1, 1);
         const clases = seccion.querySelectorAll(".lesson");
 
         clases.forEach((clase, index) => {
@@ -1211,10 +1218,37 @@
       }
     }
 
-    // ✅ Un solo DOMContentLoaded que llama a ambas funciones
-    document.addEventListener("DOMContentLoaded", () => {
-      aplicarFiltroPlan();
-      aplicarBloqueoReal();
+    function prepararEnlacesEntrega() {
+      const cursos = {
+        "personal-trainer": "Personal Trainer",
+        "nutricion": "Nutrición",
+        "funcional-hiit": "Funcional & HIIT",
+        "musculacion": "Musculación"
+      };
+
+      Object.entries(cursos).forEach(([id, nombreCurso]) => {
+        const seccion = document.getElementById(id);
+        if (!seccion) return;
+
+        seccion.querySelectorAll('a[href="entregas.html"]').forEach(link => {
+          const clase = link.closest(".lesson");
+          const nombre = clase?.querySelector("h3")?.textContent.trim() || "Entrega";
+          const tipo = link.textContent.toLowerCase().includes("trabajo") ? "trabajo-final" : "actividad";
+          link.href = "entregas.html?" + new URLSearchParams({ curso: nombreCurso, tipo, nombre });
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (error || !session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (!aplicarFiltroPlan()) return;
+      prepararEnlacesEntrega();
+      await aplicarBloqueoReal(session.user);
     });
   </script>
 </body>

@@ -109,6 +109,11 @@
     .btn--ghost{background:transparent}
     .btn--full{width:100%}
 
+    .payment-options{
+      display:grid;
+      gap:8px;
+    }
+
     /* HERO */
     .hero{
       padding:48px 0 32px;
@@ -341,10 +346,17 @@
               <li>Nutrición deportiva</li>
               <li>Materiales, actividades y campus completo</li>
             </ul>
-            <!-- ✅ REEMPLAZAR href con link real de Mercado Pago cuando Charly lo mande -->
-            <a class="btn btn--primary btn--full" href="login.html" onclick="guardarPlan('completo')">
-              Quiero el pack completo
-            </a>
+            <div class="payment-options">
+              <a class="btn btn--primary btn--full" href="https://mpago.la/1mDQ523" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+                Pago único
+              </a>
+              <a class="btn btn--full" href="https://mpago.li/33DE42R" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+                3 cuotas sin interés
+              </a>
+              <a class="btn btn--full" href="https://mpago.li/2bSfCqh" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+                6 cuotas sin interés
+              </a>
+            </div>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
 
@@ -362,10 +374,17 @@
               <li>Manual de estudio</li>
               <li>Trabajo final</li>
             </ul>
-            <!-- ✅ REEMPLAZAR href con link real de Mercado Pago cuando Charly lo mande -->
-            <a class="btn btn--primary btn--full" href="login.html" onclick="guardarPlan('personal')">
-              Elegir Personal Trainer
-            </a>
+            <div class="payment-options">
+              <a class="btn btn--primary btn--full" href="https://mpago.la/1XnC57Y" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+                Pago único
+              </a>
+              <a class="btn btn--full" href="https://mpago.li/1wTb3PR" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+                3 cuotas sin interés
+              </a>
+              <a class="btn btn--full" href="https://mpago.li/18Xp5ha" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+                6 cuotas sin interés
+              </a>
+            </div>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
 
@@ -382,9 +401,8 @@
               <li>Armado de rutinas</li>
               <li>Manual y trabajo final</li>
             </ul>
-            <!-- ✅ REEMPLAZAR href con link real de Mercado Pago cuando Charly lo mande -->
-            <a class="btn btn--primary btn--full" href="login.html" onclick="guardarPlan('hiit')">
-              Elegir Funcional & HIIT
+            <a class="btn btn--primary btn--full" href="https://mpago.la/2258v4h" onclick="return guardarPlanYRedirigir(event, 'hiit', this.href)">
+              Pago único
             </a>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
@@ -407,9 +425,8 @@
               <li>Guía de movimientos</li>
               <li>Trabajo final</li>
             </ul>
-            <!-- ✅ REEMPLAZAR href con link real de Mercado Pago cuando Charly lo mande -->
-            <a class="btn btn--primary btn--full" href="login.html" onclick="guardarPlan('musculacion')">
-              Elegir Musculación
+            <a class="btn btn--primary btn--full" href="https://mpago.la/24ZjDXL" onclick="return guardarPlanYRedirigir(event, 'musculacion', this.href)">
+              Pago único
             </a>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
@@ -428,9 +445,8 @@
               <li>Materiales descargables</li>
               <li>Trabajo final</li>
             </ul>
-            <!-- ✅ REEMPLAZAR href con link real de Mercado Pago cuando Charly lo mande -->
-            <a class="btn btn--primary btn--full" href="login.html" onclick="guardarPlan('nutricion')">
-              Elegir Nutrición deportiva
+            <a class="btn btn--primary btn--full" href="https://mpago.la/2QcmAFr" onclick="return guardarPlanYRedirigir(event, 'nutricion', this.href)">
+              Pago único
             </a>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
@@ -446,8 +462,11 @@
   </main>
 
   <script>
-    function guardarPlan(plan) {
+    function guardarPlanYRedirigir(event, plan, url) {
+      event.preventDefault();
       localStorage.setItem("plan", plan);
+      window.location.href = url;
+      return false;
     }
   </script>
 

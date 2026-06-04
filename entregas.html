@@ -1,386 +1,343 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Entregas | Campus</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entregas | Charly Cursos</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    :root{
+      --bg:#070a0f;
+      --panel:rgba(255,255,255,.05);
+      --stroke:rgba(255,255,255,.10);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.64);
+      --accent:#60d6ff;
+      --accent2:#5a6bff;
+      --shadow:0 16px 60px rgba(0,0,0,.45);
+    }
+
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui;
-      background:#070a0f;
-      color:white;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 20% 0%, rgba(96,214,255,.14), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(90,107,255,.14), transparent 55%),
+        var(--bg);
+      min-height:100vh;
     }
+
+    a{color:inherit;text-decoration:none}
 
     .container{
-      max-width:700px;
-      margin:auto;
-      padding:20px;
-    }
-
-    h1{margin-bottom:10px;}
-
-    .card{
-      background:#1e293b;
-      padding:20px;
-      border-radius:12px;
-      margin-top:20px;
-    }
-
-    input, select{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      border-radius:8px;
-      border:none;
-      box-sizing:border-box;
-    }
-
-    button{
-      margin-top:15px;
-      padding:12px;
-      width:100%;
-      background:#22c55e;
-      border:none;
-      border-radius:8px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .status{
-      margin-top:10px;
-      font-size:14px;
+      width:min(700px,92%);
+      margin:0 auto;
+      padding:32px 0 48px;
     }
 
     .top{
       display:flex;
       gap:10px;
-      margin-bottom:20px;
-      flex-wrap:wrap;
+      margin-bottom:28px;
     }
 
-    .top a{
-      text-decoration:none;
-      background:#1e293b;
-      padding:10px 14px;
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 16px;
       border-radius:999px;
-      color:white;
-      font-weight:bold;
-    }
-
-    .user{
-      margin-top:10px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
       font-size:14px;
-      color:#aaa;
+      width:100%;
     }
 
+    .btn--primary{
+      border-color:rgba(96,214,255,.25);
+      background:linear-gradient(135deg,rgba(96,214,255,.22),rgba(90,107,255,.18));
+    }
+
+    .btn--ghost{
+      background:transparent;
+      width:auto;
+    }
+
+    h1{
+      margin:0 0 6px;
+      font-size:clamp(24px,4vw,34px);
+      letter-spacing:-.5px;
+    }
+
+    .subtitle{
+      margin:0 0 24px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    /* Info box de qué se está entregando */
     .info-entrega{
-      margin-top:14px;
-      padding:12px;
-      background:rgba(96,214,255,.10);
+      background:rgba(96,214,255,.07);
       border:1px solid rgba(96,214,255,.18);
+      border-radius:16px;
+      padding:14px 16px;
+      margin-bottom:20px;
+    }
+
+    .info-entrega strong{
+      display:block;
+      color:var(--accent);
+      font-size:13px;
+      letter-spacing:.5px;
+      margin-bottom:4px;
+    }
+
+    .info-entrega span{
+      font-size:16px;
+      font-weight:700;
+    }
+
+    /* Card del formulario */
+    .card{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:20px;
+      padding:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .field{
+      margin-bottom:14px;
+    }
+
+    .field label{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:6px;
+      letter-spacing:.3px;
+    }
+
+    .field input,
+    .field select{
+      width:100%;
+      padding:12px 14px;
       border-radius:12px;
-      color:rgba(255,255,255,.86);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-size:15px;
+      font-family:inherit;
+      outline:none;
+    }
+
+    .field input:focus,
+    .field select:focus{
+      border-color:rgba(96,214,255,.30);
+    }
+
+    .field select option{
+      background:#1a1f2e;
+      color:white;
+    }
+
+    .field input[type="file"]{
+      padding:10px 14px;
+      cursor:pointer;
+    }
+
+    .field input[type="file"]::file-selector-button{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;
+      color:white;
+      padding:6px 12px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      margin-right:10px;
+    }
+
+    .status{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:12px;
       font-size:14px;
-      line-height:1.5;
+      font-weight:700;
+      display:none;
+    }
+
+    .status--ok{
+      background:rgba(134,239,172,.10);
+      border:1px solid rgba(134,239,172,.25);
+      color:#86efac;
+    }
+
+    .status--error{
+      background:rgba(252,165,165,.10);
+      border:1px solid rgba(252,165,165,.25);
+      color:#fca5a5;
+    }
+
+    .status--loading{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
     }
   </style>
-<meta charset="UTF-8">
-<title>Entregas | Campus</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#070a0f;
-  color:white;
-}
-
-.container{
-  max-width:700px;
-  margin:auto;
-  padding:20px;
-}
-
-.top{
-  display:flex;
-  gap:10px;
-  margin-bottom:20px;
-}
-
-.top a{
-  text-decoration:none;
-  background:#1e293b;
-  padding:10px 14px;
-  border-radius:999px;
-  color:white;
-  font-weight:bold;
-}
-
-.card{
-  background:#1e293b;
-  padding:20px;
-  border-radius:12px;
-  margin-top:20px;
-}
-
-input, select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:8px;
-  border:none;
-}
-
-button{
-  margin-top:15px;
-  padding:12px;
-  width:100%;
-  background:#22c55e;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.status{
-  margin-top:10px;
-  font-size:14px;
-}
-
-.info{
-  margin-top:10px;
-  padding:10px;
-  background:#111827;
-  border-radius:8px;
-  font-size:14px;
-  color:#aaa;
-}
-</style>
 </head>
-
 <body>
+  <div class="container">
 
-<div class="container">
+    <div class="top">
+      <a class="btn btn--ghost" href="modulo.html">← Volver al módulo</a>
+    </div>
 
-  <div class="top">
-    <a href="modulo.html">← Volver al módulo</a>
-    <a href="login.html">Login</a>
+    <h1>📤 Entregar actividad</h1>
+    <p class="subtitle">Subí tu archivo y lo revisamos a la brevedad.</p>
+
+    <!-- Qué se está entregando — se llena automáticamente desde la URL -->
+    <div class="info-entrega" id="info-entrega">
+      <strong>ENTREGANDO</strong>
+      <span id="label-entrega">Cargando...</span>
+    </div>
+
+    <div class="card">
+
+      <div class="field">
+        <label>Tu nombre</label>
+        <input type="text" id="nombre" placeholder="Nombre completo">
+      </div>
+
+      <div class="field">
+        <label>Curso</label>
+        <select id="curso">
+          <option value="">Seleccioná el curso</option>
+          <option value="Personal Trainer">Personal Trainer</option>
+          <option value="Musculación">Musculación</option>
+          <option value="Funcional & HIIT">Funcional & HIIT</option>
+          <option value="Nutrición">Nutrición</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Archivo (PDF, imagen, doc)</label>
+        <input type="file" id="archivo" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+      </div>
+
+      <button class="btn btn--primary" onclick="subir()">Enviar entrega</button>
+
+      <div class="status" id="status"></div>
+
+    </div>
   </div>
 
-  <h1>📤 Entregar actividad / trabajo final</h1>
-  <p>Subí tu archivo para que el profesor lo revise y corrija.</p>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      "https://yfdiejyrhaaziceyeiuc.supabase.co",
+      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
+    );
 
-  <div class="user" id="userBox">Verificando sesión...</div>
-<div class="top">
-<a href="modulo.html">← Volver</a>
-<a href="login.html">Login</a>
-</div>
+    // ✅ Leer parámetros de la URL y pre-cargar el formulario
+    const params        = new URLSearchParams(window.location.search);
+    const tipo          = params.get("tipo")   || "general";
+    const nombreEntrega = params.get("nombre") || "Entrega general";
+    const cursoPre      = params.get("curso")  || "";
 
-  <div class="info-entrega" id="infoEntrega">
-    Entrega general del campus.
-  </div>
-<h1>📤 Entregar actividad / trabajo</h1>
+    // Mostrar qué se está entregando
+    document.getElementById("label-entrega").innerText = nombreEntrega;
 
-  <div class="card">
-<div class="info" id="infoEntrega"></div>
-
-    <input type="text" id="nombre" placeholder="Tu nombre completo">
-<div class="card">
-
-    <select id="curso">
-      <option value="">Seleccionar curso</option>
-      <option>Personal Trainer</option>
-      <option>Musculación</option>
-      <option>Funcional & HIIT</option>
-      <option>Nutrición</option>
-      <option>Pack completo</option>
-    </select>
-<input type="text" id="nombre" placeholder="Tu nombre">
-<select id="curso">
-<option value="">Seleccionar curso</option>
-<option>Personal Trainer</option>
-<option>Musculación</option>
-<option>Funcional & HIIT</option>
-<option>Nutrición</option>
-</select>
-
-    <input type="file" id="archivo">
-<input type="file" id="archivo">
-
-    <button onclick="subirTrabajo()">Enviar entrega</button>
-<button onclick="subir()">Enviar entrega</button>
-
-    <div class="status" id="status"></div>
-<div class="status" id="status"></div>
-
-  </div>
-</div>
-
-</div>
-
-<script>
-const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
-const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-const supabase = window.supabase.createClient(
-"https://yfdiejyrhaaziceyeiuc.supabase.co",
-"sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
-);
-
-const params = new URLSearchParams(window.location.search);
-const tipoEntrega = params.get("tipo") || "general";
-const nombreEntrega = params.get("nombre") || "Entrega general";
-
-function formatearTexto(texto){
-  return texto
-    .replaceAll("-", " ")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, letra => letra.toUpperCase());
-}
-const tipo = params.get("tipo") || "general";
-const nombreEntrega = params.get("nombre") || "general";
-
-function mostrarInfoEntrega(){
-  const info = document.getElementById("infoEntrega");
-document.getElementById("infoEntrega").innerText =
-"Estás entregando: " + tipo + " - " + nombreEntrega;
-
-  if(tipoEntrega === "general"){
-    info.innerText = "Estás realizando una entrega general del campus.";
-    return;
-  }
-async function subir(){
-
-  info.innerText = "Estás entregando: " + formatearTexto(tipoEntrega) + " — " + formatearTexto(nombreEntrega);
-}
-const nombre = document.getElementById("nombre").value;
-const curso = document.getElementById("curso").value;
-const archivo = document.getElementById("archivo").files[0];
-const status = document.getElementById("status");
-
-async function verificarSesion(){
-  const { data } = await supabase.auth.getUser();
-  const box = document.getElementById("userBox");
-if(!nombre || !curso || !archivo){
-status.innerText = "⚠️ Completá todo";
-return;
-}
-
-  if(!data.user){
-    box.innerText = "❌ No estás logueado";
-    return;
-  }
-const { data } = await supabase.auth.getUser();
-
-  box.innerText = "✅ Sesión iniciada: " + data.user.email;
-if(!data.user){
-status.innerText = "❌ Iniciá sesión";
-return;
-}
-
-async function subirTrabajo(){
-  const nombre = document.getElementById("nombre").value.trim();
-  const curso = document.getElementById("curso").value;
-  const archivo = document.getElementById("archivo").files[0];
-  const status = document.getElementById("status");
-
-  if(!nombre || !curso || !archivo){
-    status.innerText = "⚠️ Completá todos los campos";
-    return;
-  }
-
-  const { data } = await supabase.auth.getUser();
-
-  if(!data.user){
-    status.innerText = "❌ Tenés que iniciar sesión";
-    return;
-  }
-
-  const email = data.user.email;
-
-  status.innerText = "Subiendo archivo...";
-
-  const nombreSeguro = archivo.name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9._-]/g, "_");
-
-  const fileName = Date.now() + "-" + nombreSeguro;
-
-  const { error: uploadError } = await supabase.storage
-    .from("entregas")
-    .upload(fileName, archivo);
-
-  if(uploadError){
-    status.innerText = "❌ Error subiendo archivo";
-    console.log(uploadError);
-    return;
-  }
-
-  const { data: urlData } = supabase.storage
-    .from("entregas")
-    .getPublicUrl(fileName);
-
-  const archivo_url = urlData.publicUrl;
-
-  const detalleEntrega = tipoEntrega + " - " + nombreEntrega;
-
-  const { error: dbError } = await supabase
-    .from("entregas")
-    .insert([
-      {
-        user_email: email,
-        nombre: nombre,
-        curso: curso,
-        archivo_url: archivo_url,
-        comentario: detalleEntrega,
-        estado: "pendiente"
+    // Pre-seleccionar el curso si viene en la URL
+    const selectCurso = document.getElementById("curso");
+    if (cursoPre) {
+      for (const option of selectCurso.options) {
+        if (option.value.toLowerCase().includes(cursoPre.toLowerCase())) {
+          option.selected = true;
+          break;
+        }
       }
-    ]);
+    }
 
-  if(dbError){
-    status.innerText = "❌ Error guardando en base de datos";
-    console.log(dbError);
-    return;
-  }
+    // Mostrar estado
+    function mostrarStatus(texto, tipo) {
+      const el = document.getElementById("status");
+      el.style.display = "block";
+      el.className = "status status--" + tipo;
+      el.innerText = texto;
+    }
 
-  status.innerText = "✅ Entrega enviada correctamente";
+    async function subir() {
+      const nombre  = document.getElementById("nombre").value.trim();
+      const curso   = document.getElementById("curso").value;
+      const archivo = document.getElementById("archivo").files[0];
 
-  document.getElementById("nombre").value = "";
-  document.getElementById("curso").value = "";
-  document.getElementById("archivo").value = "";
-}
-const fileName = Date.now() + "-" + archivo.name;
+      if (!nombre) { mostrarStatus("⚠️ Completá tu nombre.", "error"); return; }
+      if (!curso)  { mostrarStatus("⚠️ Seleccioná el curso.", "error"); return; }
+      if (!archivo){ mostrarStatus("⚠️ Seleccioná un archivo.", "error"); return; }
 
-await supabase.storage
-.from("entregas")
-.upload(fileName, archivo);
+      mostrarStatus("Subiendo archivo...", "loading");
 
-mostrarInfoEntrega();
-verificarSesion();
-const { data: urlData } = supabase.storage
-.from("entregas")
-.getPublicUrl(fileName);
+      // Verificar sesión
+      const { data: userData } = await supabaseClient.auth.getUser();
+      if (!userData.user) {
+        mostrarStatus("❌ Tenés que iniciar sesión para entregar.", "error");
+        setTimeout(() => { window.location.href = "login.html"; }, 1500);
+        return;
+      }
 
-await supabase.from("entregas").insert([{
-user_email: data.user.email,
-nombre: nombre,
-curso: curso,
-archivo_url: urlData.publicUrl,
-tipo: tipo,
-nombre_entrega: nombreEntrega,
-estado: "pendiente"
-}]);
+      // Subir archivo al storage
+      const nombreSeguro = archivo.name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
+      const fileName = userData.user.id + "/" + Date.now() + "-" + nombreSeguro;
 
-status.innerText = "✅ Entregado";
-}
-</script>
+      const { error: uploadError } = await supabaseClient.storage
+        .from("entregas")
+        .upload(fileName, archivo);
 
+      if (uploadError) {
+        mostrarStatus("❌ Error al subir el archivo: " + uploadError.message, "error");
+        return;
+      }
+
+      // Obtener URL pública
+      const { data: urlData } = supabaseClient.storage
+        .from("entregas")
+        .getPublicUrl(fileName);
+
+      const detalleEntrega = tipo.replaceAll("-", " ") + " - " + nombreEntrega.replaceAll("-", " ");
+
+      // Guardar en base de datos
+      const { error: dbError } = await supabaseClient
+        .from("entregas")
+        .insert([{
+          user_email:     userData.user.email,
+          nombre:         nombre,
+          curso:          curso,
+          archivo_url:    urlData.publicUrl,
+          comentario:     detalleEntrega,
+          estado:         "pendiente"
+        }]);
+
+      if (dbError) {
+        mostrarStatus("❌ Error al registrar la entrega: " + dbError.message, "error");
+        return;
+      }
+
+      mostrarStatus("✅ ¡Entrega enviada! Charly la va a revisar pronto.", "ok");
+
+      // Limpiar formulario
+      document.getElementById("nombre").value = "";
+      document.getElementById("archivo").value = "";
+    }
+  </script>
 </body>
+</html>

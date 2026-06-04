@@ -454,7 +454,7 @@
         </div>
 
         <p class="bottom-note">
-          Una vez que abonás, creás tu cuenta y accedés al campus con el contenido de tu plan desbloqueado.
+          Una vez confirmado el pago, activamos tu acceso al contenido correspondiente dentro del campus.
         </p>
 
       </div>
@@ -464,7 +464,8 @@
   <script>
     function guardarPlanYRedirigir(event, plan, url) {
       event.preventDefault();
-      localStorage.setItem("plan", plan);
+      localStorage.setItem("plan_preseleccionado", plan);
+      localStorage.removeItem("plan");
       window.location.href = url;
       return false;
     }

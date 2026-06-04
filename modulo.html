@@ -187,7 +187,7 @@
     }
 
     .nav-link{
-      display:block;
+      display:none;
       padding:12px 14px;
       border-radius:14px;
       background:rgba(255,255,255,.04);
@@ -206,6 +206,7 @@
     }
 
     .course{
+      display:none;
       background:var(--panel);
       border:1px solid rgba(255,255,255,.08);
       border-radius:24px;
@@ -1118,16 +1119,28 @@
     const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
     const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const CURSOS_VALIDOS = ["personal", "nutricion", "hiit", "musculacion"];
 
-    function aplicarFiltroPlan() {
-      const plan = localStorage.getItem("plan");
-      const planesValidos = ["personal", "nutricion", "hiit", "musculacion", "completo"];
+    async function obtenerPlanConfirmado(email) {
+      const { data, error } = await supabaseClient
+        .from("progreso_alumnos")
+        .select("curso")
+        .eq("user_email", email);
 
-      if (!planesValidos.includes(plan)) {
-        window.location.href = "planes.html";
-        return false;
+      if (error) {
+        console.error("No se pudo verificar el acceso confirmado.", error);
+        return null;
       }
 
+      const cursosActivos = [...new Set(
+        (data || []).map(item => item.curso).filter(curso => CURSOS_VALIDOS.includes(curso))
+      )];
+
+      if (CURSOS_VALIDOS.every(curso => cursosActivos.includes(curso))) return "completo";
+      return cursosActivos.length === 1 ? cursosActivos[0] : null;
+    }
+
+    function aplicarFiltroPlan(plan) {
       const secciones = {
         personal:    document.getElementById("personal-trainer"),
         nutricion:   document.getElementById("nutricion"),
@@ -1159,7 +1172,7 @@
       return true;
     }
 
-    async function aplicarBloqueoReal(user) {
+    async function aplicarBloqueoReal(user, plan) {
       if (!user) {
         window.location.href = "login.html";
         return;
@@ -1172,7 +1185,7 @@
         { id: "nutricion",        key: "nutricion" },
         { id: "funcional-hiit",   key: "hiit" },
         { id: "musculacion",      key: "musculacion" }
-      ];
+      ].filter(curso => plan === "completo" || curso.key === plan);
 
       for (const curso of cursos) {
         const seccion = document.getElementById(curso.id);
@@ -1246,9 +1259,16 @@
         return;
       }
 
-      if (!aplicarFiltroPlan()) return;
+      localStorage.removeItem("plan");
+      const plan = await obtenerPlanConfirmado(session.user.email);
+      if (!plan) {
+        window.location.href = "campus.html";
+        return;
+      }
+
+      aplicarFiltroPlan(plan);
       prepararEnlacesEntrega();
-      await aplicarBloqueoReal(session.user);
+      await aplicarBloqueoReal(session.user, plan);
     });
   </script>
 </body>

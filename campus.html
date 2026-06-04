@@ -370,6 +370,8 @@
       musculacion: "Musculación"
     };
 
+    const CURSOS_VALIDOS = Object.keys(NOMBRES_CURSO);
+
     function formatPlanName(plan) {
       const names = {
         completo: "Pack Completo",
@@ -381,7 +383,26 @@
       return names[plan] || "Sin plan definido";
     }
 
-    function applyPlanContent(plan) {
+    async function obtenerPlanConfirmado(email) {
+      const { data, error } = await supabaseClient
+        .from("progreso_alumnos")
+        .select("curso")
+        .eq("user_email", email);
+
+      if (error) {
+        console.error("No se pudo verificar el acceso confirmado.", error);
+        return null;
+      }
+
+      const cursosActivos = [...new Set(
+        (data || []).map(item => item.curso).filter(curso => CURSOS_VALIDOS.includes(curso))
+      )];
+
+      if (CURSOS_VALIDOS.every(curso => cursosActivos.includes(curso))) return "completo";
+      return cursosActivos.length === 1 ? cursosActivos[0] : null;
+    }
+
+    function applyPlanContent(plan, planPreseleccionado) {
       const planName      = document.getElementById("plan-name");
       const planDesc      = document.getElementById("plan-description");
       const statAccess    = document.getElementById("stat-access");
@@ -441,14 +462,18 @@
         mainTitle.innerText   = "Entrar a Nutrición deportiva";
         mainText.innerText    = "Accedé al contenido, materiales y actividades.";
       } else {
-        planDesc.innerText    = "Todavía no hay un plan definido.";
-        statAccess.innerText  = "Sin plan";
-        statAccessTxt.innerText = "Seleccioná primero una opción de acceso.";
-        noticeBox.innerHTML   = "<strong>Estado:</strong> todavía no seleccionaste ningún plan.";
-        modulesDesc.innerText = "Para continuar, elegí un plan.";
+        const seleccionValida = CURSOS_VALIDOS.includes(planPreseleccionado) || planPreseleccionado === "completo";
+        planName.innerText    = seleccionValida
+          ? "Plan preseleccionado: " + formatPlanName(planPreseleccionado)
+          : "Acceso pendiente";
+        planDesc.innerText    = "Tu acceso todavía no fue activado.";
+        statAccess.innerText  = "Acceso pendiente";
+        statAccessTxt.innerText = "Charly activará tu cuenta después de confirmar el pago.";
+        noticeBox.innerHTML   = "<strong>Estado:</strong> tu acceso todavía no fue activado.";
+        modulesDesc.innerText = "Cuando se confirme el pago vas a poder entrar al contenido correspondiente.";
         mainBadge.innerText   = "Pendiente";
-        mainTitle.innerText   = "Elegí un plan";
-        mainText.innerText    = "Primero necesitás seleccionar una formación.";
+        mainTitle.innerText   = "Activación pendiente";
+        mainText.innerText    = "Si todavía no elegiste una formación, podés revisar los planes disponibles.";
         mainButton.setAttribute("href", "planes.html");
         mainButton.innerText  = "Ir a planes";
       }
@@ -460,8 +485,10 @@
         : (plan ? [plan] : []);
 
       if (cursos.length === 0) {
-        document.getElementById("progreso-descripcion").innerText = "Elegí un plan para ver tu progreso.";
+        document.getElementById("progreso-descripcion").innerText = "Tu acceso todavía no fue activado.";
         document.getElementById("pct-total").innerText = "0%";
+        document.getElementById("barra-total").style.width = "0%";
+        document.getElementById("progreso-cursos").innerHTML = "";
         return;
       }
 
@@ -515,8 +542,10 @@
       const email = session.user.email;
       document.getElementById("user-email").innerText = "Sesión: " + email;
 
-      const plan = localStorage.getItem("plan");
-      applyPlanContent(plan);
+      localStorage.removeItem("plan");
+      const planPreseleccionado = localStorage.getItem("plan_preseleccionado");
+      const plan = await obtenerPlanConfirmado(email);
+      applyPlanContent(plan, planPreseleccionado);
       await cargarProgreso(email, plan);
     }
 

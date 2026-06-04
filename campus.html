@@ -365,7 +365,7 @@
             Las demás quedan listas para conectarlas con la lógica real del curso.
           </div>
         </div>
-@@ -532,22 +539,24 @@
+@@ -532,14 +539,16 @@
   <script>
     const supabaseClient = window.supabase.createClient(
       "https://yfdiejyrhaaziceyeiuc.supabase.co",
@@ -384,12 +384,3 @@
         document.getElementById("user-email").innerText = "Sesión iniciada: " + session.user.email;
       }
     }
-
-    async function logout() {
-      await supabaseClient.auth.signOut();
-      window.location.href = "login.html";
-    }
-
-    checkUser();
-  </script>
-</body>

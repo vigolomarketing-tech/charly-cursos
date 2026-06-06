@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campus | Charly Cursos</title>
+  <title>Campus | FTZ Campus</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -226,11 +226,11 @@
 <body>
   <header class="topbar">
     <div class="container topbar__inner">
-      <a class="brand" href="index.html" aria-label="Charly Cursos">
-        <span class="brand__mark">C</span>
+      <a class="brand" href="index.html" aria-label="Fitness Training Zone">
+        <span class="brand__mark">FTZ</span>
         <span class="brand__text">
-          <strong>CHARLY</strong>
-          <small>CURSOS</small>
+          <strong>FTZ</strong>
+          <small>CAMPUS</small>
         </span>
       </a>
       <div class="topbar__actions">
@@ -316,32 +316,32 @@
           </article>
 
           <article class="module-card module-card--locked">
-            <span class="module-lock">Próximamente</span>
-            <span class="module-badge">Más contenido</span>
-            <h3>Expansión del campus</h3>
-            <p>Después podemos conectar más módulos, evaluaciones, certificados y progreso real por plan.</p>
+            <span class="module-lock">Disponible en el campus</span>
+            <span class="module-badge">Seguimiento</span>
+            <h3>Acompañamiento académico</h3>
+            <p>El equipo revisa tus entregas y acompaña tu avance dentro del recorrido formativo.</p>
             <div class="module-meta">
               <span>• Evaluaciones</span>
               <span>• Certificación</span>
               <span>• Desbloqueos</span>
             </div>
             <div class="module-actions">
-              <button class="btn" type="button">En desarrollo</button>
+              <button class="btn" type="button">Incluido</button>
             </div>
           </article>
 
           <article class="module-card module-card--locked">
-            <span class="module-lock">Próximamente</span>
-            <span class="module-badge">Automatización</span>
-            <h3>Pagos y acceso real</h3>
-            <p>La próxima etapa es conectar pagos, acceso automático y contenido filtrado por cada plan.</p>
+            <span class="module-lock">Gestión activa</span>
+            <span class="module-badge">Acceso</span>
+            <h3>Activación del plan</h3>
+            <p>Una vez confirmado el pago, se habilita el contenido correspondiente a tu formación.</p>
             <div class="module-meta">
               <span>• MercadoPago</span>
               <span>• Acceso por compra</span>
               <span>• Planes dinámicos</span>
             </div>
             <div class="module-actions">
-              <button class="btn" type="button">En desarrollo</button>
+              <button class="btn" type="button">Gestionado por FTZ</button>
             </div>
           </article>
         </div>
@@ -371,6 +371,9 @@
     };
 
     const CURSOS_VALIDOS = Object.keys(NOMBRES_CURSO);
+    const ACCESOS_TEST = {
+      "santiagovigolo7@gmail.com": "completo"
+    };
 
     function formatPlanName(plan) {
       const names = {
@@ -384,6 +387,9 @@
     }
 
     async function obtenerPlanConfirmado(email) {
+      const emailNormalizado = (email || "").toLowerCase();
+      if (ACCESOS_TEST[emailNormalizado]) return ACCESOS_TEST[emailNormalizado];
+
       const { data, error } = await supabaseClient
         .from("progreso_alumnos")
         .select("curso")
@@ -468,7 +474,7 @@
           : "Acceso pendiente";
         planDesc.innerText    = "Tu acceso todavía no fue activado.";
         statAccess.innerText  = "Acceso pendiente";
-        statAccessTxt.innerText = "Charly activará tu cuenta después de confirmar el pago.";
+        statAccessTxt.innerText = "El equipo de FTZ activará tu cuenta después de confirmar el pago.";
         noticeBox.innerHTML   = "<strong>Estado:</strong> tu acceso todavía no fue activado.";
         modulesDesc.innerText = "Cuando se confirme el pago vas a poder entrar al contenido correspondiente.";
         mainBadge.innerText   = "Pendiente";

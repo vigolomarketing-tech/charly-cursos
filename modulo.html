@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Módulos | Charly Cursos</title>
+  <title>Módulos | FTZ Campus</title>
 
   <!-- ✅ FIX 1: Supabase importado correctamente -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -365,11 +365,11 @@
 <body>
   <header class="topbar">
     <div class="container topbar__inner">
-      <a class="brand" href="index.html" aria-label="Charly Cursos">
-        <span class="brand__mark">C</span>
+      <a class="brand" href="index.html" aria-label="Fitness Training Zone">
+        <span class="brand__mark">FTZ</span>
         <span class="brand__text">
-          <strong>CHARLY</strong>
-          <small>CURSOS</small>
+          <strong>FTZ</strong>
+          <small>CAMPUS</small>
         </span>
       </a>
       <div class="topbar__actions">
@@ -1105,8 +1105,8 @@
           </div>
 
           <div class="note">
-            <strong>Nota:</strong> este plan está pensado para mostrar el valor de la formación integral.
-            Después podés hacer que el alumno vea todo este contenido desde un solo acceso.
+            <strong>Pack completo:</strong> este acceso integra las cuatro formaciones en un solo recorrido.
+            Desde el campus podés avanzar por cada curso según tu progreso habilitado.
           </div>
         </section>
 
@@ -1120,8 +1120,14 @@
     const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     const CURSOS_VALIDOS = ["personal", "nutricion", "hiit", "musculacion"];
+    const ACCESOS_TEST = {
+      "santiagovigolo7@gmail.com": "completo"
+    };
 
     async function obtenerPlanConfirmado(email) {
+      const emailNormalizado = (email || "").toLowerCase();
+      if (ACCESOS_TEST[emailNormalizado]) return ACCESOS_TEST[emailNormalizado];
+
       const { data, error } = await supabaseClient
         .from("progreso_alumnos")
         .select("curso")

@@ -291,6 +291,11 @@
         setTimeout(() => { window.location.href = "login.html"; }, 1500);
         return;
       }
+      const emailAutenticado = userData.user.email;
+      if (!emailAutenticado) {
+        mostrarStatus("No se pudo confirmar el email de la sesion. Volve a iniciar sesion.", "error");
+        return;
+      }
 
       // Subir archivo al storage
       const nombreSeguro = archivo.name
@@ -319,7 +324,7 @@
       const { error: dbError } = await supabaseClient
         .from("entregas")
         .insert([{
-          user_email:     userData.user.email,
+          user_email:     emailAutenticado,
           nombre:         nombre,
           curso:          curso,
           archivo_url:    urlData.publicUrl,
@@ -328,7 +333,10 @@
         }]);
 
       if (dbError) {
-        mostrarStatus("❌ Error al registrar la entrega: " + dbError.message, "error");
+        const mensaje = (dbError.message || "").includes("row-level security")
+          ? "No se pudo registrar la entrega por permisos de Supabase. Revisar la policy RLS de entregas."
+          : "Error al registrar la entrega: " + dbError.message;
+        mostrarStatus(mensaje, "error");
         return;
       }
 

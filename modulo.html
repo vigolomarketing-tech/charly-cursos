@@ -1178,65 +1178,6 @@
       return true;
     }
 
-    async function aplicarBloqueoReal(user, plan) {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      const email = user.email;
-
-      const cursos = [
-        { id: "personal-trainer", key: "personal" },
-        { id: "nutricion",        key: "nutricion" },
-        { id: "funcional-hiit",   key: "hiit" },
-        { id: "musculacion",      key: "musculacion" }
-      ].filter(curso => plan === "completo" || curso.key === plan);
-
-      for (const curso of cursos) {
-        const seccion = document.getElementById(curso.id);
-        if (!seccion) continue;
-
-        const { data: progreso, error } = await supabaseClient
-          .from("progreso_alumnos")
-          .select("clase_actual")
-          .eq("user_email", email)
-          .eq("curso", curso.key)
-          .maybeSingle();
-
-        if (error) console.error("No se pudo cargar el progreso de " + curso.key, error);
-
-        const clasePermitida = Math.max(Number(progreso?.clase_actual) || 1, 1);
-        const clases = seccion.querySelectorAll(".lesson");
-
-        clases.forEach((clase, index) => {
-          const numeroClase = index + 1;
-
-          if (numeroClase > clasePermitida) {
-            clase.style.opacity       = "0.35";
-            clase.style.pointerEvents = "none";
-            clase.style.filter        = "grayscale(1)";
-
-            if (!clase.querySelector(".bloqueo-aviso")) {
-              const aviso = document.createElement("div");
-              aviso.className  = "bloqueo-aviso";
-              aviso.innerText  = "🔒 Clase bloqueada — se habilita al completar la etapa anterior.";
-              aviso.style.cssText = `
-                margin-top:12px;
-                padding:12px;
-                border-radius:14px;
-                background:rgba(255,255,255,.08);
-                border:1px solid rgba(255,255,255,.12);
-                color:rgba(255,255,255,.78);
-                font-weight:700;
-              `;
-              clase.appendChild(aviso);
-            }
-          }
-        });
-      }
-    }
-
     function prepararEnlacesEntrega() {
       const cursos = {
         "personal-trainer": "Personal Trainer",
@@ -1274,7 +1215,6 @@
 
       aplicarFiltroPlan(plan);
       prepararEnlacesEntrega();
-      await aplicarBloqueoReal(session.user, plan);
     });
   </script>
 </body>

@@ -28,7 +28,6 @@
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     textarea,select{width:100%;margin-top:10px;border:none;border-radius:12px;padding:12px;box-sizing:border-box;font-family:inherit}
     textarea{min-height:70px;resize:vertical}
-    .unlock{margin-top:12px;padding:12px;border-radius:14px;background:rgba(96,214,255,.08);border:1px solid rgba(96,214,255,.15)}
   </style>
 </head>
 
@@ -37,7 +36,7 @@
   <div class="top">
     <div>
       <h1>Panel de entregas</h1>
-      <div class="muted">Panel interno para corregir trabajos y habilitar clases.</div>
+      <div class="muted">Panel interno para corregir entregas y gestionar revisiones.</div>
     </div>
     <div>
       <a class="btn" href="campus.html">Volver al campus</a>
@@ -92,14 +91,6 @@ function escapeHtml(valor){
   })[caracter]);
 }
 
-function cursoKey(curso){
-  const c = (curso || "").toLowerCase();
-  if(c.includes("nutric")) return "nutricion";
-  if(c.includes("funcional") || c.includes("hiit")) return "hiit";
-  if(c.includes("muscul")) return "musculacion";
-  return "personal";
-}
-
 async function cargarEntregas(){
   const autorizado = await protegerAdmin();
   if(!autorizado) return;
@@ -144,28 +135,9 @@ async function cargarEntregas(){
 
       <div class="actions">
         <a class="btn btn-primary" href="${entrega.archivo_url}" target="_blank">Abrir archivo</a>
+        <button class="btn btn-ok" onclick="actualizarEstado('${entrega.id}', 'aprobado')">Aprobar entrega</button>
         <button class="btn btn-bad" onclick="actualizarEstado('${entrega.id}', 'corregir')">Pedir corrección</button>
         <button class="btn" onclick="actualizarEstado('${entrega.id}', 'pendiente')">Pendiente</button>
-      </div>
-
-      <div class="unlock">
-        <div class="muted">Elegí hasta qué clase queda habilitado este alumno:</div>
-        <select id="clase-${entrega.id}">
-          <option value="1">Clase 1</option>
-          <option value="2">Clase 2</option>
-          <option value="3">Clase 3</option>
-          <option value="4">Clase 4</option>
-          <option value="5">Clase 5</option>
-          <option value="6">Clase 6</option>
-          <option value="7">Clase 7</option>
-          <option value="8">Clase 8</option>
-          <option value="9">Clase 9</option>
-          <option value="10">Clase 10</option>
-        </select>
-
-        <button class="btn btn-ok" onclick="aprobarYDesbloquear('${entrega.id}', '${entrega.user_email}', '${entrega.curso}')">
-          Aprobar y desbloquear clase
-        </button>
       </div>
 
       <textarea id="comentario-${entrega.id}" placeholder="Comentario para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
@@ -193,61 +165,6 @@ async function actualizarEstado(id, estado){
     return;
   }
 
-  cargarEntregas();
-}
-
-async function aprobarYDesbloquear(id, email, curso){
-  const autorizado = await protegerAdmin();
-  if(!autorizado) return;
-
-  const clase = Number(document.getElementById("clase-" + id).value);
-  const cursoNormalizado = cursoKey(curso);
-
-  const { error: entregaError } = await supabase
-    .from("entregas")
-    .update({ estado: "aprobado" })
-    .eq("id", id);
-
-  if(entregaError){
-    alert("Error aprobando entrega: " + entregaError.message);
-    return;
-  }
-
-  const { data: progresoExistente, error: consultaError } = await supabase
-    .from("progreso_alumnos")
-    .select("user_email")
-    .eq("user_email", email)
-    .eq("curso", cursoNormalizado)
-    .limit(1);
-
-  if(consultaError){
-    alert("Entrega aprobada, pero error consultando progreso: " + consultaError.message);
-    return;
-  }
-
-  const progresoQuery = progresoExistente && progresoExistente.length
-    ? supabase
-        .from("progreso_alumnos")
-        .update({ clase_actual: clase, updated_at: new Date().toISOString() })
-        .eq("user_email", email)
-        .eq("curso", cursoNormalizado)
-    : supabase
-        .from("progreso_alumnos")
-        .insert({
-          user_email: email,
-          curso: cursoNormalizado,
-          clase_actual: clase,
-          updated_at: new Date().toISOString()
-        });
-
-  const { error: progresoError } = await progresoQuery;
-
-  if(progresoError){
-    alert("Entrega aprobada, pero error desbloqueando clase: " + progresoError.message);
-    return;
-  }
-
-  alert("✅ Aprobado y clase desbloqueada");
   cargarEntregas();
 }
 

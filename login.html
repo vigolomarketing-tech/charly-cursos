@@ -132,9 +132,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    const ADMIN_EMAIL = "fitnesstrainingzone16@gmail.com";
+    const AUTH_CONFIRM_REDIRECT_URL = "https://vigolomarketing-tech.github.io/charly-cursos/login.html";
+
     const supabaseClient = window.supabase.createClient(
       "https://yfdiejyrhaaziceyeiuc.supabase.co",
-      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
+      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d",
+      {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true
+        }
+      }
     );
 
     const messageBox = document.getElementById("messageBox");
@@ -148,6 +158,68 @@
       messageBox.style.color = isError
         ? "rgba(255,180,180,.95)"
         : "rgba(255,255,255,.85)";
+    }
+
+    function getAuthParam(nombre) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      return searchParams.get(nombre) || hashParams.get(nombre);
+    }
+
+    function tieneParametrosAuth() {
+      const hash = window.location.hash || "";
+      const searchParams = new URLSearchParams(window.location.search);
+      return hash.includes("access_token")
+        || hash.includes("refresh_token")
+        || hash.includes("error")
+        || searchParams.has("code")
+        || searchParams.has("token_hash")
+        || searchParams.has("type")
+        || searchParams.has("error")
+        || searchParams.has("error_description");
+    }
+
+    function limpiarUrlAuth() {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    function destinoParaUsuario(user) {
+      const email = (user && user.email ? user.email : "").toLowerCase();
+      return email === ADMIN_EMAIL ? "admin.html" : "campus.html";
+    }
+
+    async function procesarRetornoAuth() {
+      if (!tieneParametrosAuth()) return;
+
+      const authError = getAuthParam("error_description") || getAuthParam("error");
+      if (authError) {
+        limpiarUrlAuth();
+        showMessage("No se pudo confirmar la cuenta: " + authError, true);
+        return;
+      }
+
+      showMessage("Confirmando cuenta...");
+      const { data, error } = await supabaseClient.auth.getSession();
+      limpiarUrlAuth();
+
+      if (error) {
+        showMessage("No se pudo confirmar la sesion. Inicia sesion con tu email y contrasena.", true);
+        return;
+      }
+
+      if (data.session && data.session.user) {
+        const destino = destinoParaUsuario(data.session.user);
+        showMessage(destino === "admin.html"
+          ? "Cuenta confirmada. Entrando al panel..."
+          : "Cuenta confirmada. Entrando al campus...");
+        setTimeout(() => {
+          window.location.href = destino;
+        }, 700);
+      } else {
+        showMessage("Cuenta confirmada. Ya podes iniciar sesion.");
+      }
     }
 
     async function register() {
@@ -165,6 +237,7 @@
         email: email,
         password: password,
         options: {
+          emailRedirectTo: AUTH_CONFIRM_REDIRECT_URL,
           data: {
             nombre: nombre,
             whatsapp: whatsapp
@@ -190,7 +263,7 @@
         return;
       }
 
-      const { error } = await supabaseClient.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password
       });
@@ -198,12 +271,23 @@
       if (error) {
         showMessage("Error: " + error.message, true);
       } else {
-        showMessage("Ingreso correcto. Entrando al campus...");
+        const user = data.user || (await supabaseClient.auth.getUser()).data.user;
+        if (!user || !user.email) {
+          showMessage("No se pudo confirmar el usuario autenticado.", true);
+          return;
+        }
+
+        const destino = destinoParaUsuario(user);
+        showMessage(destino === "admin.html"
+          ? "Ingreso correcto. Entrando al panel..."
+          : "Ingreso correcto. Entrando al campus...");
         setTimeout(() => {
-          window.location.href = "campus.html";
+          window.location.href = destino;
         }, 700);
       }
     }
+
+    procesarRetornoAuth();
   </script>
 
 </body>

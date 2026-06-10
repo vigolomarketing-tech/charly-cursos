@@ -6,6 +6,24 @@
   <meta name="description" content="Cursos online de entrenamiento, musculación, funcional, HIIT y nutrición deportiva. Accedé al campus, estudiá a tu ritmo y obtené tu certificación." />
   <title>Fitness Training Zone | Formación Fitness Online</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    (function () {
+      const hash = window.location.hash || "";
+      const searchParams = new URLSearchParams(window.location.search);
+      const tieneCallbackAuth = hash.includes("access_token")
+        || hash.includes("refresh_token")
+        || hash.includes("error")
+        || searchParams.has("code")
+        || searchParams.has("token_hash")
+        || searchParams.has("type")
+        || searchParams.has("error")
+        || searchParams.has("error_description");
+
+      if (tieneCallbackAuth) {
+        window.location.replace("login.html" + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
 </head>
 
 <body>

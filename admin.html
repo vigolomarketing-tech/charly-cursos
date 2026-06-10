@@ -53,26 +53,103 @@
 <script>
 const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
 const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+let supabase = null;
 
 const ADMIN_EMAIL = "fitnesstrainingzone16@gmail.com";
+const QUERY_TIMEOUT_MS = 15000;
+let adminValidado = null;
+
+function statusEl(){
+  return document.getElementById("status");
+}
+
+function listaEl(){
+  return document.getElementById("lista");
+}
+
+function mostrarStatus(texto, tipo = "info"){
+  const status = statusEl();
+  if(!status) return;
+  status.innerText = texto;
+  status.style.color = tipo === "error" ? "#fca5a5" : "rgba(255,255,255,.62)";
+}
+
+function detalleError(error){
+  if(!error) return "Error desconocido.";
+  return error.message || error.error_description || JSON.stringify(error);
+}
+
+function mostrarError(mensaje, error){
+  console.error("[admin.html]", mensaje, error);
+  mostrarStatus(`${mensaje}\nDetalle: ${detalleError(error)}`, "error");
+}
+
+window.addEventListener("error", (event) => {
+  mostrarError("Error JavaScript en el panel admin.", event.error || event.message);
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  mostrarError("Error asincronico en el panel admin.", event.reason);
+});
+
+function conTimeout(promesa, contexto){
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Timeout en ${contexto} despues de ${QUERY_TIMEOUT_MS / 1000}s`));
+    }, QUERY_TIMEOUT_MS);
+  });
+
+  return Promise.race([promesa, timeout]).finally(() => clearTimeout(timeoutId));
+}
+
+function inicializarSupabase(){
+  if(supabase) return supabase;
+  if(!window.supabase || !window.supabase.createClient){
+    throw new Error("No se cargo la libreria de Supabase JS.");
+  }
+
+  supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true
+    }
+  });
+  return supabase;
+}
 
 async function protegerAdmin() {
-  const { data, error } = await supabase.auth.getUser();
+  try {
+    const cliente = inicializarSupabase();
+    console.log("[admin.html] Validando sesion admin...");
+    const { data, error } = await conTimeout(cliente.auth.getUser(), "Supabase Auth");
 
-  if (error || !data.user) {
-    alert("Tenés que iniciar sesión.");
-    window.location.href = "login.html";
+    if (error) throw error;
+
+    if (!data || !data.user) {
+      console.warn("[admin.html] No hay usuario autenticado. Redirigiendo a login.");
+      mostrarStatus("Tenes que iniciar sesion para entrar al panel.", "error");
+      setTimeout(() => { window.location.href = "login.html"; }, 900);
+      return false;
+    }
+
+    const email = (data.user.email || "").toLowerCase();
+    console.log("[admin.html] Usuario autenticado:", email);
+
+    if (email !== ADMIN_EMAIL) {
+      console.warn("[admin.html] Acceso denegado para:", email);
+      mostrarStatus("No tenes permisos para entrar al panel.", "error");
+      setTimeout(() => { window.location.href = "campus.html"; }, 900);
+      return false;
+    }
+
+    adminValidado = data.user;
+    console.log("[admin.html] Admin validado correctamente.");
+    return true;
+  } catch (error) {
+    mostrarError("Error validando acceso admin.", error);
     return false;
   }
-
-  if ((data.user.email || "").toLowerCase() !== ADMIN_EMAIL) {
-    alert("No tenés permisos para entrar al panel.");
-    window.location.href = "campus.html";
-    return false;
-  }
-
-  return true;
 }
 
 function estadoClase(estado){
@@ -92,32 +169,47 @@ function escapeHtml(valor){
 }
 
 async function cargarEntregas(){
-  const autorizado = await protegerAdmin();
-  if(!autorizado) return;
+  if(!adminValidado){
+    const autorizado = await protegerAdmin();
+    if(!autorizado) return;
+  }
 
-  const status = document.getElementById("status");
-  const lista = document.getElementById("lista");
-  status.innerText = "Cargando entregas...";
+  const lista = listaEl();
+  mostrarStatus("Cargando entregas...");
   lista.innerHTML = "";
 
-  const { data, error } = await supabase
-    .from("entregas")
-    .select("*")
-    .order("created_at", { ascending:false });
+  try {
+    console.log("[admin.html] Consultando public.entregas como admin:", adminValidado.email);
+    const consulta = supabase
+      .from("entregas")
+      .select("id,user_email,nombre,curso,archivo_url,comentario,estado,created_at")
+      .order("created_at", { ascending:false });
 
-  if(error){
-    status.innerText = "Error cargando entregas: " + error.message;
+    const { data, error } = await conTimeout(consulta, "consulta public.entregas");
+    if(error) throw error;
+
+    const entregas = Array.isArray(data) ? data : [];
+    console.log("[admin.html] Entregas recibidas:", entregas.length, entregas);
+    renderizarEntregas(entregas);
+  } catch(error) {
+    mostrarError("Error cargando entregas desde Supabase.", error);
+  }
+}
+
+function renderizarEntregas(entregas){
+  const lista = listaEl();
+  lista.innerHTML = "";
+
+  if(entregas.length === 0){
+    mostrarStatus("Todavia no hay trabajos enviados.");
     return;
   }
 
-  if(!data || data.length === 0){
-    status.innerText = "Todavía no hay trabajos enviados.";
-    return;
-  }
+  mostrarStatus("Total de entregas: " + entregas.length);
 
-  status.innerText = "Total de entregas: " + data.length;
-
-  data.forEach(entrega => {
+  entregas.forEach(entrega => {
+    const id = escapeHtml(entrega.id);
+    const archivoUrl = escapeHtml(entrega.archivo_url || "#");
     const card = document.createElement("div");
     card.className = "card";
 
@@ -134,16 +226,16 @@ async function cargarEntregas(){
       </div>
 
       <div class="actions">
-        <a class="btn btn-primary" href="${entrega.archivo_url}" target="_blank">Abrir archivo</a>
-        <button class="btn btn-ok" onclick="actualizarEstado('${entrega.id}', 'aprobado')">Aprobar entrega</button>
-        <button class="btn btn-bad" onclick="actualizarEstado('${entrega.id}', 'corregir')">Pedir corrección</button>
-        <button class="btn" onclick="actualizarEstado('${entrega.id}', 'pendiente')">Pendiente</button>
+        <a class="btn btn-primary" href="${archivoUrl}" target="_blank" rel="noopener">Abrir archivo</a>
+        <button class="btn btn-ok" onclick="actualizarEstado('${id}', 'aprobado')">Aprobar entrega</button>
+        <button class="btn btn-bad" onclick="actualizarEstado('${id}', 'corregir')">Pedir correccion</button>
+        <button class="btn" onclick="actualizarEstado('${id}', 'pendiente')">Pendiente</button>
       </div>
 
-      <textarea id="comentario-${entrega.id}" placeholder="Comentario para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
+      <textarea id="comentario-${id}" placeholder="Comentario para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
 
       <div class="actions">
-        <button class="btn" onclick="guardarComentario('${entrega.id}')">Guardar comentario</button>
+        <button class="btn" onclick="guardarComentario('${id}')">Guardar comentario</button>
       </div>
     `;
 
@@ -152,46 +244,62 @@ async function cargarEntregas(){
 }
 
 async function actualizarEstado(id, estado){
-  const autorizado = await protegerAdmin();
-  if(!autorizado) return;
-
-  const { error } = await supabase
-    .from("entregas")
-    .update({ estado })
-    .eq("id", id);
-
-  if(error){
-    alert("Error actualizando estado: " + error.message);
-    return;
+  if(!adminValidado){
+    const autorizado = await protegerAdmin();
+    if(!autorizado) return;
   }
 
-  cargarEntregas();
+  try {
+    console.log("[admin.html] Actualizando estado:", { id, estado });
+    const { error } = await conTimeout(
+      supabase
+        .from("entregas")
+        .update({ estado })
+        .eq("id", id),
+      "actualizacion de estado"
+    );
+
+    if(error) throw error;
+    await cargarEntregas();
+  } catch(error){
+    mostrarError("Error actualizando estado.", error);
+    alert("Error actualizando estado: " + detalleError(error));
+  }
 }
 
 async function guardarComentario(id){
-  const autorizado = await protegerAdmin();
-  if(!autorizado) return;
+  if(!adminValidado){
+    const autorizado = await protegerAdmin();
+    if(!autorizado) return;
+  }
 
   const comentario = document.getElementById("comentario-" + id).value;
 
-  const { error } = await supabase
-    .from("entregas")
-    .update({ comentario })
-    .eq("id", id);
+  try {
+    console.log("[admin.html] Guardando comentario:", { id });
+    const { error } = await conTimeout(
+      supabase
+        .from("entregas")
+        .update({ comentario })
+        .eq("id", id),
+      "guardado de comentario"
+    );
 
-  if(error){
-    alert("Error guardando comentario: " + error.message);
-    return;
+    if(error) throw error;
+    alert("Comentario guardado");
+    await cargarEntregas();
+  } catch(error){
+    mostrarError("Error guardando comentario.", error);
+    alert("Error guardando comentario: " + detalleError(error));
   }
-
-  alert("Comentario guardado");
 }
 
-protegerAdmin().then((ok) => {
-  if(ok){
-    cargarEntregas();
-  }
-});
+async function iniciarAdmin(){
+  const ok = await protegerAdmin();
+  if(ok) await cargarEntregas();
+}
+
+iniciarAdmin();
 </script>
 </body>
 </html>

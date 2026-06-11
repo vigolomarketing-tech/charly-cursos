@@ -57,7 +57,9 @@ let supabase = null;
 
 const ADMIN_EMAIL = "fitnesstrainingzone16@gmail.com";
 const QUERY_TIMEOUT_MS = 15000;
+const USER_TIMEOUT_MS = 6000;
 let adminValidado = null;
+let diagnostico = [];
 
 function statusEl(){
   return document.getElementById("status");
@@ -67,11 +69,21 @@ function listaEl(){
   return document.getElementById("lista");
 }
 
-function mostrarStatus(texto, tipo = "info"){
+function registrarPaso(texto, tipo = "info"){
+  const marca = new Date().toLocaleTimeString("es-AR");
+  diagnostico.push(`[${marca}] ${texto}`);
+  console.log("[admin.html]", texto);
+
   const status = statusEl();
   if(!status) return;
-  status.innerText = texto;
+  status.style.whiteSpace = "pre-line";
+  status.innerText = diagnostico.join("\n");
   status.style.color = tipo === "error" ? "#fca5a5" : "rgba(255,255,255,.62)";
+}
+
+function reiniciarDiagnostico(texto){
+  diagnostico = [];
+  registrarPaso(texto);
 }
 
 function detalleError(error){
@@ -81,7 +93,7 @@ function detalleError(error){
 
 function mostrarError(mensaje, error){
   console.error("[admin.html]", mensaje, error);
-  mostrarStatus(`${mensaje}\nDetalle: ${detalleError(error)}`, "error");
+  registrarPaso(`${mensaje} Detalle: ${detalleError(error)}`, "error");
 }
 
 window.addEventListener("error", (event) => {
@@ -92,12 +104,12 @@ window.addEventListener("unhandledrejection", (event) => {
   mostrarError("Error asincronico en el panel admin.", event.reason);
 });
 
-function conTimeout(promesa, contexto){
+function conTimeout(promesa, contexto, ms = QUERY_TIMEOUT_MS){
   let timeoutId;
   const timeout = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(new Error(`Timeout en ${contexto} despues de ${QUERY_TIMEOUT_MS / 1000}s`));
-    }, QUERY_TIMEOUT_MS);
+      reject(new Error(`Timeout en ${contexto} despues de ${ms / 1000}s`));
+    }, ms);
   });
 
   return Promise.race([promesa, timeout]).finally(() => clearTimeout(timeoutId));
@@ -105,6 +117,7 @@ function conTimeout(promesa, contexto){
 
 function inicializarSupabase(){
   if(supabase) return supabase;
+  registrarPaso("Inicializando Supabase...");
   if(!window.supabase || !window.supabase.createClient){
     throw new Error("No se cargo la libreria de Supabase JS.");
   }
@@ -112,42 +125,62 @@ function inicializarSupabase(){
   supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
     auth: {
       autoRefreshToken: true,
-      persistSession: true
+      persistSession: true,
+      detectSessionInUrl: true
     }
   });
+  registrarPaso("Supabase inicializado.");
   return supabase;
+}
+
+async function obtenerSesion(cliente){
+  registrarPaso("Cargando sesion...");
+  const { data, error } = await conTimeout(cliente.auth.getSession(), "getSession");
+  if(error) throw error;
+
+  if(!data || !data.session || !data.session.user){
+    throw new Error("No hay sesion activa. Volve a iniciar sesion desde login.html.");
+  }
+
+  registrarPaso("Sesion obtenida: " + (data.session.user.email || "sin email"));
+  return data.session;
+}
+
+async function diagnosticarGetUser(cliente){
+  registrarPaso("Verificando usuario con getUser...");
+  try {
+    const { data, error } = await conTimeout(cliente.auth.getUser(), "getUser", USER_TIMEOUT_MS);
+    if(error) throw error;
+    registrarPaso("getUser OK: " + ((data.user && data.user.email) || "sin email"));
+  } catch(error) {
+    console.warn("[admin.html] getUser no completo, se continua con la sesion activa.", error);
+    registrarPaso("Aviso: getUser no completo. Se usa la sesion activa para la consulta. Detalle: " + detalleError(error));
+  }
 }
 
 async function protegerAdmin() {
   try {
     const cliente = inicializarSupabase();
-    console.log("[admin.html] Validando sesion admin...");
-    const { data, error } = await conTimeout(cliente.auth.getUser(), "Supabase Auth");
+    const session = await obtenerSesion(cliente);
+    const email = (session.user.email || "").toLowerCase();
 
-    if (error) throw error;
-
-    if (!data || !data.user) {
-      console.warn("[admin.html] No hay usuario autenticado. Redirigiendo a login.");
-      mostrarStatus("Tenes que iniciar sesion para entrar al panel.", "error");
-      setTimeout(() => { window.location.href = "login.html"; }, 900);
-      return false;
-    }
-
-    const email = (data.user.email || "").toLowerCase();
-    console.log("[admin.html] Usuario autenticado:", email);
-
+    registrarPaso("Validando administrador...");
     if (email !== ADMIN_EMAIL) {
       console.warn("[admin.html] Acceso denegado para:", email);
-      mostrarStatus("No tenes permisos para entrar al panel.", "error");
+      registrarPaso("Acceso denegado para: " + email, "error");
       setTimeout(() => { window.location.href = "campus.html"; }, 900);
       return false;
     }
 
-    adminValidado = data.user;
-    console.log("[admin.html] Admin validado correctamente.");
+    adminValidado = session.user;
+    registrarPaso("Administrador validado: " + email);
+    await diagnosticarGetUser(cliente);
     return true;
   } catch (error) {
     mostrarError("Error validando acceso admin.", error);
+    if(detalleError(error).includes("No hay sesion activa")){
+      setTimeout(() => { window.location.href = "login.html"; }, 1400);
+    }
     return false;
   }
 }
@@ -175,7 +208,7 @@ async function cargarEntregas(){
   }
 
   const lista = listaEl();
-  mostrarStatus("Cargando entregas...");
+  registrarPaso("Consultando entregas...");
   lista.innerHTML = "";
 
   try {
@@ -189,7 +222,8 @@ async function cargarEntregas(){
     if(error) throw error;
 
     const entregas = Array.isArray(data) ? data : [];
-    console.log("[admin.html] Entregas recibidas:", entregas.length, entregas);
+    registrarPaso("Entregas encontradas: " + entregas.length);
+    console.log("[admin.html] Entregas recibidas:", entregas);
     renderizarEntregas(entregas);
   } catch(error) {
     mostrarError("Error cargando entregas desde Supabase.", error);
@@ -201,11 +235,11 @@ function renderizarEntregas(entregas){
   lista.innerHTML = "";
 
   if(entregas.length === 0){
-    mostrarStatus("Todavia no hay trabajos enviados.");
+    registrarPaso("No hay entregas para renderizar.");
     return;
   }
 
-  mostrarStatus("Total de entregas: " + entregas.length);
+  registrarPaso("Renderizando entregas...");
 
   entregas.forEach(entrega => {
     const id = escapeHtml(entrega.id);
@@ -217,6 +251,7 @@ function renderizarEntregas(entregas){
       <div class="card-top">
         <div>
           <h3>${escapeHtml(entrega.nombre || "Alumno sin nombre")}</h3>
+          <div class="muted">ID: <strong>${id}</strong></div>
           <div class="muted">${escapeHtml(entrega.user_email || "Sin email")}</div>
           <div class="muted">Curso: <strong>${escapeHtml(entrega.curso || "Sin curso")}</strong></div>
           <div class="muted">Detalle: <strong>${escapeHtml(entrega.comentario || "Entrega general")}</strong></div>
@@ -241,6 +276,8 @@ function renderizarEntregas(entregas){
 
     lista.appendChild(card);
   });
+
+  registrarPaso("Renderizado completo.");
 }
 
 async function actualizarEstado(id, estado){
@@ -295,6 +332,7 @@ async function guardarComentario(id){
 }
 
 async function iniciarAdmin(){
+  reiniciarDiagnostico("Inicializando panel admin...");
   const ok = await protegerAdmin();
   if(ok) await cargarEntregas();
 }

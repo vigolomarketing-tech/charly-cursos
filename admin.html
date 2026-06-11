@@ -29,6 +29,9 @@
     .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
     .card h3{margin:0 0 6px;font-size:20px}
     .meta{display:grid;gap:4px}
+    .details{margin-top:8px;color:rgba(255,255,255,.55);font-size:13px}
+    .details summary{cursor:pointer;font-weight:700}
+    .details code{display:block;margin-top:6px;max-width:100%;overflow-wrap:anywhere;color:rgba(255,255,255,.72)}
     .tag{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-size:12px;font-weight:800;text-transform:uppercase}
     .tag-pendiente{color:#fde68a;border-color:rgba(253,230,138,.35);background:rgba(253,230,138,.10)}
     .tag-aprobado{color:#86efac;border-color:rgba(134,239,172,.35);background:rgba(134,239,172,.10)}
@@ -45,6 +48,7 @@
       .card{padding:14px;border-radius:16px}
       .card-top{display:grid;grid-template-columns:1fr;gap:10px}
       .tag{width:max-content;max-width:100%}
+      .btn-file{min-height:36px;padding:8px 12px}
     }
   </style>
 </head>
@@ -251,23 +255,25 @@ function renderizarEntregas(entregas){
       <div class="card-top">
         <div class="meta">
           <h3>${escapeHtml(entrega.nombre || "Alumno sin nombre")}</h3>
-          <div class="muted">ID: <strong>${id}</strong></div>
-          <div class="muted">${escapeHtml(entrega.user_email || "Sin email")}</div>
+          <div class="muted">Email: <strong>${escapeHtml(entrega.user_email || "Sin email")}</strong></div>
           <div class="muted">Curso: <strong>${escapeHtml(entrega.curso || "Sin curso")}</strong></div>
-          <div class="muted">Detalle: <strong>${escapeHtml(entrega.comentario || "Entrega general")}</strong></div>
           <div class="muted">Fecha: ${fechaLinda(entrega.created_at)}</div>
+          <details class="details">
+            <summary>Ver detalles</summary>
+            <code>ID: ${id}</code>
+          </details>
         </div>
         <span data-role="estado" class="${estadoClase(estado)}">${escapeHtml(estado)}</span>
       </div>
 
       <div class="actions">
-        <a class="btn btn-primary" href="${archivoUrl}" target="_blank" rel="noopener">Abrir archivo</a>
+        <a class="btn btn-primary btn-file" href="${archivoUrl}" target="_blank" rel="noopener">Abrir archivo</a>
         <button class="btn btn-ok" onclick="actualizarEstado('${id}', 'aprobado')">Aprobar entrega</button>
         <button class="btn btn-bad" onclick="actualizarEstado('${id}', 'corregir')">Pedir correccion</button>
         <button class="btn" onclick="actualizarEstado('${id}', 'pendiente')">Pendiente</button>
       </div>
 
-      <textarea id="comentario-${id}" placeholder="Comentario para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
+      <textarea id="comentario-${id}" placeholder="Escribí observaciones para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
 
       <div class="actions">
         <button class="btn" onclick="guardarComentario('${id}')">Guardar comentario</button>

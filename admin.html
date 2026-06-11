@@ -12,25 +12,40 @@
   <style>
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#070a0f;color:white}
     .container{width:min(1100px,92%);margin:auto;padding:24px 0}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-    h1{margin:0;font-size:32px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:white;font-weight:700;text-decoration:none;cursor:pointer}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+    .top-actions{display:flex;gap:8px;flex-wrap:wrap}
+    h1{margin:0;font-size:clamp(26px,5vw,32px)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:white;font-weight:700;text-decoration:none;cursor:pointer;line-height:1.2}
     .btn-primary{background:linear-gradient(135deg,rgba(96,214,255,.28),rgba(90,107,255,.22));border-color:rgba(96,214,255,.25)}
     .btn-ok{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.35)}
     .btn-bad{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.35)}
     .panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:16px}
     .status,.muted{color:rgba(255,255,255,.62);font-size:14px;line-height:1.45}
-    .grid{display:grid;gap:12px;margin-top:16px}
-    .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px}
-    .card-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-    .card h3{margin:0 0 4px;font-size:20px}
-    .tag{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-size:12px;font-weight:800}
-    .tag-pendiente{color:#fde68a;border-color:rgba(253,230,138,.28)}
-    .tag-aprobado{color:#86efac;border-color:rgba(134,239,172,.28)}
-    .tag-corregir{color:#fca5a5;border-color:rgba(252,165,165,.28)}
+    .status{min-height:20px}
+    .status-ok{color:#86efac}
+    .status-error{color:#fca5a5}
+    .grid{display:grid;gap:14px;margin-top:16px}
+    .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
+    .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .card h3{margin:0 0 6px;font-size:20px}
+    .meta{display:grid;gap:4px}
+    .tag{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-size:12px;font-weight:800;text-transform:uppercase}
+    .tag-pendiente{color:#fde68a;border-color:rgba(253,230,138,.35);background:rgba(253,230,138,.10)}
+    .tag-aprobado{color:#86efac;border-color:rgba(134,239,172,.35);background:rgba(134,239,172,.10)}
+    .tag-correccion{color:#fca5a5;border-color:rgba(252,165,165,.35);background:rgba(252,165,165,.10)}
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    textarea,select{width:100%;margin-top:10px;border:none;border-radius:12px;padding:12px;box-sizing:border-box;font-family:inherit}
-    textarea{min-height:70px;resize:vertical}
+    textarea{width:100%;margin-top:12px;border:none;border-radius:12px;padding:12px;box-sizing:border-box;font-family:inherit;min-height:82px;resize:vertical}
+    .card-message{margin-top:10px;color:#86efac;font-size:14px;min-height:18px}
+
+    @media (max-width: 640px){
+      .container{width:min(94%,1100px);padding:18px 0 32px}
+      .top,.top-actions,.actions{display:grid;grid-template-columns:1fr;width:100%}
+      .btn{width:100%;min-height:42px;white-space:normal;text-align:center}
+      .panel{padding:14px;border-radius:16px}
+      .card{padding:14px;border-radius:16px}
+      .card-top{display:grid;grid-template-columns:1fr;gap:10px}
+      .tag{width:max-content;max-width:100%}
+    }
   </style>
 </head>
 
@@ -41,75 +56,26 @@
       <h1>Panel de entregas</h1>
       <div class="muted">Panel interno para corregir entregas y gestionar revisiones.</div>
     </div>
-    <div>
+    <div class="top-actions">
       <a class="btn" href="campus.html">Volver al campus</a>
       <button class="btn btn-primary" onclick="cargarEntregas()">Actualizar</button>
     </div>
   </div>
 
   <div class="panel">
-    <div id="scriptProbe" class="status">JS pendiente de ejecutar...</div>
     <div id="status" class="status">Cargando entregas...</div>
     <div id="lista" class="grid"></div>
   </div>
 </div>
 
 <script>
-console.log("ADMIN SCRIPT CARGADO");
-window.__ADMIN_ERRORES_INICIALES = [];
-window.__ADMIN_SCRIPT_CARGADO = true;
-
-function mostrarErrorTemprano(mensaje) {
-  window.__ADMIN_ERRORES_INICIALES.push(mensaje);
-  const probe = document.getElementById("scriptProbe");
-  const status = document.getElementById("status");
-  if (probe) {
-    probe.style.whiteSpace = "pre-line";
-    probe.style.color = "#fca5a5";
-    probe.innerText = "ADMIN SCRIPT CARGADO\n" + window.__ADMIN_ERRORES_INICIALES.join("\n");
-  }
-  if (status) {
-    status.style.whiteSpace = "pre-line";
-    status.style.color = "#fca5a5";
-    status.innerText = mensaje;
-  }
-}
-
-window.onerror = function (message, source, lineno, colno, error) {
-  const detalle = "window.onerror: " + message + " (" + lineno + ":" + colno + ")";
-  console.error("[admin.html]", detalle, error);
-  mostrarErrorTemprano(detalle);
-};
-
-window.onunhandledrejection = function (event) {
-  const reason = event && event.reason ? event.reason : "Promise rechazada sin detalle";
-  const detalle = "unhandledrejection: " + (reason.message || String(reason));
-  console.error("[admin.html]", detalle, reason);
-  mostrarErrorTemprano(detalle);
-};
-
-document.getElementById("scriptProbe").innerText = "ADMIN SCRIPT CARGADO";
-</script>
-
-<script>
-console.log("ADMIN SCRIPT CARGADO");
 const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
 const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
-let supabaseClient = null;
-
 const ADMIN_EMAIL = "fitnesstrainingzone16@gmail.com";
 const QUERY_TIMEOUT_MS = 15000;
-const USER_TIMEOUT_MS = 6000;
+
+let supabaseClient = null;
 let adminValidado = null;
-let diagnostico = [];
-
-function statusEl(){
-  return obtenerElemento("status");
-}
-
-function listaEl(){
-  return obtenerElemento("lista");
-}
 
 function obtenerElemento(id){
   const elemento = document.getElementById(id);
@@ -119,20 +85,18 @@ function obtenerElemento(id){
   return elemento;
 }
 
-function registrarPaso(texto, tipo = "info"){
-  const marca = new Date().toLocaleTimeString("es-AR");
-  diagnostico.push(`[${marca}] ${texto}`);
-  console.log("[admin.html]", texto);
-
-  const status = statusEl();
-  status.style.whiteSpace = "pre-line";
-  status.innerText = diagnostico.join("\n");
-  status.style.color = tipo === "error" ? "#fca5a5" : "rgba(255,255,255,.62)";
+function statusEl(){
+  return obtenerElemento("status");
 }
 
-function reiniciarDiagnostico(texto){
-  diagnostico = [];
-  registrarPaso(texto);
+function listaEl(){
+  return obtenerElemento("lista");
+}
+
+function mostrarStatus(texto, tipo = "info"){
+  const status = statusEl();
+  status.className = "status" + (tipo === "ok" ? " status-ok" : tipo === "error" ? " status-error" : "");
+  status.innerText = texto;
 }
 
 function detalleError(error){
@@ -142,15 +106,15 @@ function detalleError(error){
 
 function mostrarError(mensaje, error){
   console.error("[admin.html]", mensaje, error);
-  registrarPaso(`${mensaje} Detalle: ${detalleError(error)}`, "error");
+  mostrarStatus(`${mensaje}: ${detalleError(error)}`, "error");
 }
 
 window.addEventListener("error", (event) => {
-  mostrarError("Error JavaScript en el panel admin.", event.error || event.message);
+  mostrarError("Error JavaScript en el panel admin", event.error || event.message);
 });
 
 window.addEventListener("unhandledrejection", (event) => {
-  mostrarError("Error asincronico en el panel admin.", event.reason);
+  mostrarError("Error asincronico en el panel admin", event.reason);
 });
 
 function conTimeout(promesa, contexto, ms = QUERY_TIMEOUT_MS){
@@ -166,7 +130,6 @@ function conTimeout(promesa, contexto, ms = QUERY_TIMEOUT_MS){
 
 function inicializarSupabase(){
   if(supabaseClient) return supabaseClient;
-  registrarPaso("Inicializando Supabase...");
   if(!window.supabase || !window.supabase.createClient){
     throw new Error("No se cargo la libreria de Supabase JS.");
   }
@@ -178,12 +141,11 @@ function inicializarSupabase(){
       detectSessionInUrl: true
     }
   });
-  registrarPaso("Supabase inicializado.");
+
   return supabaseClient;
 }
 
 async function obtenerSesion(cliente){
-  registrarPaso("Cargando sesion...");
   const { data, error } = await conTimeout(cliente.auth.getSession(), "getSession");
   if(error) throw error;
 
@@ -191,20 +153,7 @@ async function obtenerSesion(cliente){
     throw new Error("No hay sesion activa. Volve a iniciar sesion desde login.html.");
   }
 
-  registrarPaso("Sesion obtenida: " + (data.session.user.email || "sin email"));
   return data.session;
-}
-
-async function diagnosticarGetUser(cliente){
-  registrarPaso("Verificando usuario con getUser...");
-  try {
-    const { data, error } = await conTimeout(cliente.auth.getUser(), "getUser", USER_TIMEOUT_MS);
-    if(error) throw error;
-    registrarPaso("getUser OK: " + ((data.user && data.user.email) || "sin email"));
-  } catch(error) {
-    console.warn("[admin.html] getUser no completo, se continua con la sesion activa.", error);
-    registrarPaso("Aviso: getUser no completo. Se usa la sesion activa para la consulta. Detalle: " + detalleError(error));
-  }
 }
 
 async function protegerAdmin() {
@@ -213,20 +162,17 @@ async function protegerAdmin() {
     const session = await obtenerSesion(cliente);
     const email = (session.user.email || "").toLowerCase();
 
-    registrarPaso("Validando administrador...");
     if (email !== ADMIN_EMAIL) {
       console.warn("[admin.html] Acceso denegado para:", email);
-      registrarPaso("Acceso denegado para: " + email, "error");
+      mostrarStatus("No tenes permisos para entrar al panel.", "error");
       setTimeout(() => { window.location.href = "campus.html"; }, 900);
       return false;
     }
 
     adminValidado = session.user;
-    registrarPaso("Administrador validado: " + email);
-    await diagnosticarGetUser(cliente);
     return true;
   } catch (error) {
-    mostrarError("Error validando acceso admin.", error);
+    mostrarError("Error validando acceso admin", error);
     if(detalleError(error).includes("No hay sesion activa")){
       setTimeout(() => { window.location.href = "login.html"; }, 1400);
     }
@@ -236,8 +182,13 @@ async function protegerAdmin() {
 
 function estadoClase(estado){
   if(estado === "aprobado") return "tag tag-aprobado";
-  if(estado === "corregir") return "tag tag-corregir";
+  if(estado === "correccion" || estado === "corregir") return "tag tag-correccion";
   return "tag tag-pendiente";
+}
+
+function etiquetaEstado(estado){
+  if(estado === "corregir") return "correccion";
+  return estado || "pendiente";
 }
 
 function fechaLinda(fecha){
@@ -252,17 +203,16 @@ function escapeHtml(valor){
 }
 
 async function cargarEntregas(){
+  mostrarStatus("Cargando entregas...");
+
   if(!adminValidado){
     const autorizado = await protegerAdmin();
     if(!autorizado) return;
   }
 
-  const lista = listaEl();
-  registrarPaso("Consultando entregas...");
-  lista.innerHTML = "";
+  listaEl().innerHTML = "";
 
   try {
-    console.log("[admin.html] Consultando public.entregas como admin:", adminValidado.email);
     const consulta = supabaseClient
       .from("entregas")
       .select("id,user_email,nombre,curso,archivo_url,comentario,estado,created_at")
@@ -271,12 +221,9 @@ async function cargarEntregas(){
     const { data, error } = await conTimeout(consulta, "consulta public.entregas");
     if(error) throw error;
 
-    const entregas = Array.isArray(data) ? data : [];
-    registrarPaso("Entregas encontradas: " + entregas.length);
-    console.log("[admin.html] Entregas recibidas:", entregas);
-    renderizarEntregas(entregas);
+    renderizarEntregas(Array.isArray(data) ? data : []);
   } catch(error) {
-    mostrarError("Error cargando entregas desde Supabase.", error);
+    mostrarError("Error cargando entregas desde Supabase", error);
   }
 }
 
@@ -285,21 +232,24 @@ function renderizarEntregas(entregas){
   lista.innerHTML = "";
 
   if(entregas.length === 0){
-    registrarPaso("No hay entregas para renderizar.");
+    mostrarStatus("Todavia no hay trabajos enviados.");
     return;
   }
 
-  registrarPaso("Renderizando entregas...");
+  mostrarStatus("Total de entregas: " + entregas.length, "ok");
 
   entregas.forEach(entrega => {
-    const id = escapeHtml(entrega.id);
+    const idOriginal = entrega.id;
+    const id = escapeHtml(idOriginal);
+    const estado = etiquetaEstado(entrega.estado);
     const archivoUrl = escapeHtml(entrega.archivo_url || "#");
     const card = document.createElement("div");
     card.className = "card";
+    card.dataset.id = idOriginal;
 
     card.innerHTML = `
       <div class="card-top">
-        <div>
+        <div class="meta">
           <h3>${escapeHtml(entrega.nombre || "Alumno sin nombre")}</h3>
           <div class="muted">ID: <strong>${id}</strong></div>
           <div class="muted">${escapeHtml(entrega.user_email || "Sin email")}</div>
@@ -307,7 +257,7 @@ function renderizarEntregas(entregas){
           <div class="muted">Detalle: <strong>${escapeHtml(entrega.comentario || "Entrega general")}</strong></div>
           <div class="muted">Fecha: ${fechaLinda(entrega.created_at)}</div>
         </div>
-        <span class="${estadoClase(entrega.estado)}">${escapeHtml(entrega.estado || "pendiente")}</span>
+        <span data-role="estado" class="${estadoClase(estado)}">${escapeHtml(estado)}</span>
       </div>
 
       <div class="actions">
@@ -322,12 +272,11 @@ function renderizarEntregas(entregas){
       <div class="actions">
         <button class="btn" onclick="guardarComentario('${id}')">Guardar comentario</button>
       </div>
+      <div class="card-message" data-role="mensaje"></div>
     `;
 
     lista.appendChild(card);
   });
-
-  registrarPaso("Renderizado completo.");
 }
 
 async function actualizarEstado(id, estado){
@@ -337,7 +286,6 @@ async function actualizarEstado(id, estado){
   }
 
   try {
-    console.log("[admin.html] Actualizando estado:", { id, estado });
     const { error } = await conTimeout(
       supabaseClient
         .from("entregas")
@@ -347,9 +295,9 @@ async function actualizarEstado(id, estado){
     );
 
     if(error) throw error;
-    await cargarEntregas();
+    actualizarTarjeta(id, { estado, mensaje: "Estado actualizado" });
   } catch(error){
-    mostrarError("Error actualizando estado.", error);
+    mostrarError("Error actualizando estado", error);
     alert("Error actualizando estado: " + detalleError(error));
   }
 }
@@ -363,7 +311,6 @@ async function guardarComentario(id){
   const comentario = document.getElementById("comentario-" + id).value;
 
   try {
-    console.log("[admin.html] Guardando comentario:", { id });
     const { error } = await conTimeout(
       supabaseClient
         .from("entregas")
@@ -373,16 +320,40 @@ async function guardarComentario(id){
     );
 
     if(error) throw error;
-    alert("Comentario guardado");
-    await cargarEntregas();
+    actualizarTarjeta(id, { mensaje: "Comentario guardado" });
   } catch(error){
-    mostrarError("Error guardando comentario.", error);
+    mostrarError("Error guardando comentario", error);
     alert("Error guardando comentario: " + detalleError(error));
   }
 }
 
+function actualizarTarjeta(id, cambios){
+  const card = Array.from(document.querySelectorAll(".card"))
+    .find(item => item.dataset.id === String(id));
+  if(!card) return;
+
+  if(cambios.estado){
+    const estado = etiquetaEstado(cambios.estado);
+    const tag = card.querySelector('[data-role="estado"]');
+    if(tag){
+      tag.className = estadoClase(estado);
+      tag.innerText = estado;
+    }
+  }
+
+  if(cambios.mensaje){
+    const mensaje = card.querySelector('[data-role="mensaje"]');
+    if(mensaje){
+      mensaje.innerText = cambios.mensaje;
+      setTimeout(() => {
+        if(mensaje.innerText === cambios.mensaje) mensaje.innerText = "";
+      }, 3000);
+    }
+  }
+}
+
 async function iniciarAdmin(){
-  reiniciarDiagnostico("Inicializando panel admin...");
+  mostrarStatus("Cargando entregas...");
   const ok = await protegerAdmin();
   if(ok) await cargarEntregas();
 }

@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Panel Admin | FTZ Campus</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -45,12 +48,51 @@
   </div>
 
   <div class="panel">
+    <div id="scriptProbe" class="status">JS pendiente de ejecutar...</div>
     <div id="status" class="status">Cargando entregas...</div>
     <div id="lista" class="grid"></div>
   </div>
 </div>
 
 <script>
+console.log("ADMIN SCRIPT CARGADO");
+window.__ADMIN_ERRORES_INICIALES = [];
+window.__ADMIN_SCRIPT_CARGADO = true;
+
+function mostrarErrorTemprano(mensaje) {
+  window.__ADMIN_ERRORES_INICIALES.push(mensaje);
+  const probe = document.getElementById("scriptProbe");
+  const status = document.getElementById("status");
+  if (probe) {
+    probe.style.whiteSpace = "pre-line";
+    probe.style.color = "#fca5a5";
+    probe.innerText = "ADMIN SCRIPT CARGADO\n" + window.__ADMIN_ERRORES_INICIALES.join("\n");
+  }
+  if (status) {
+    status.style.whiteSpace = "pre-line";
+    status.style.color = "#fca5a5";
+    status.innerText = mensaje;
+  }
+}
+
+window.onerror = function (message, source, lineno, colno, error) {
+  const detalle = "window.onerror: " + message + " (" + lineno + ":" + colno + ")";
+  console.error("[admin.html]", detalle, error);
+  mostrarErrorTemprano(detalle);
+};
+
+window.onunhandledrejection = function (event) {
+  const reason = event && event.reason ? event.reason : "Promise rechazada sin detalle";
+  const detalle = "unhandledrejection: " + (reason.message || String(reason));
+  console.error("[admin.html]", detalle, reason);
+  mostrarErrorTemprano(detalle);
+};
+
+document.getElementById("scriptProbe").innerText = "ADMIN SCRIPT CARGADO";
+</script>
+
+<script>
+console.log("ADMIN SCRIPT CARGADO");
 const supabaseUrl = "https://yfdiejyrhaaziceyeiuc.supabase.co";
 const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
 let supabase = null;
@@ -62,11 +104,19 @@ let adminValidado = null;
 let diagnostico = [];
 
 function statusEl(){
-  return document.getElementById("status");
+  return obtenerElemento("status");
 }
 
 function listaEl(){
-  return document.getElementById("lista");
+  return obtenerElemento("lista");
+}
+
+function obtenerElemento(id){
+  const elemento = document.getElementById(id);
+  if(!elemento){
+    throw new Error("No existe el elemento HTML #" + id + " requerido por admin.html.");
+  }
+  return elemento;
 }
 
 function registrarPaso(texto, tipo = "info"){
@@ -75,7 +125,6 @@ function registrarPaso(texto, tipo = "info"){
   console.log("[admin.html]", texto);
 
   const status = statusEl();
-  if(!status) return;
   status.style.whiteSpace = "pre-line";
   status.innerText = diagnostico.join("\n");
   status.style.color = tipo === "error" ? "#fca5a5" : "rgba(255,255,255,.62)";
@@ -196,7 +245,8 @@ function fechaLinda(fecha){
 }
 
 function escapeHtml(valor){
-  return String(valor ?? "").replace(/[&<>"']/g, caracter => ({
+  const texto = valor == null ? "" : valor;
+  return String(texto).replace(/[&<>"']/g, caracter => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   })[caracter]);
 }

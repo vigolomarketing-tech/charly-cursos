@@ -371,13 +371,14 @@
     };
 
     const CURSOS_VALIDOS = Object.keys(NOMBRES_CURSO);
-    const ACCESOS_TEST = {
-      "santiagovigolo7@gmail.com": "completo"
-    };
+    let cursosConfirmadosActuales = [];
 
     function formatPlanName(plan) {
       const names = {
         completo: "Pack Completo",
+        multi: cursosConfirmadosActuales
+          .map(curso => NOMBRES_CURSO[curso] || curso)
+          .join(" + "),
         personal: "Personal Trainer",
         hiit: "Funcional & HIIT",
         musculacion: "Musculación",
@@ -387,9 +388,6 @@
     }
 
     async function obtenerPlanConfirmado(email) {
-      const emailNormalizado = (email || "").toLowerCase();
-      if (ACCESOS_TEST[emailNormalizado]) return ACCESOS_TEST[emailNormalizado];
-
       const { data, error } = await supabaseClient
         .from("progreso_alumnos")
         .select("curso")
@@ -403,8 +401,10 @@
       const cursosActivos = [...new Set(
         (data || []).map(item => item.curso).filter(curso => CURSOS_VALIDOS.includes(curso))
       )];
+      cursosConfirmadosActuales = cursosActivos;
 
       if (CURSOS_VALIDOS.every(curso => cursosActivos.includes(curso))) return "completo";
+      if (cursosActivos.length > 1) return "multi";
       return cursosActivos.length === 1 ? cursosActivos[0] : null;
     }
 
@@ -431,6 +431,17 @@
         mainBadge.innerText   = "Pack completo activo";
         mainTitle.innerText   = "Entrar al contenido completo";
         mainText.innerText    = "Accedé a Personal Trainer, Nutrición, Funcional & HIIT y Musculación.";
+      } else if (plan === "multi") {
+        planDesc.innerText    = "Tenés acceso a tus cursos activos.";
+        statAccess.innerText  = "Acceso activo";
+        statAccessTxt.innerText = "Tu cuenta está habilitada para: " + formatPlanName(plan) + ".";
+        noticeBox.innerHTML   = "<strong>Estado:</strong> tenés cursos activos en el campus.";
+        modulesDesc.innerText = "Desde acá podés entrar a los cursos habilitados para tu cuenta.";
+        mainBadge.innerText   = "Cursos activos";
+        mainTitle.innerText   = "Entrar a mis cursos";
+        mainText.innerText    = "Accedé al contenido, clases, actividades y materiales habilitados.";
+        mainButton.setAttribute("href", "modulo.html");
+        mainButton.innerText  = "Entrar a mis cursos";
       } else if (plan === "personal") {
         planDesc.innerText    = "Tenés acceso al curso de Personal Trainer.";
         statAccess.innerText  = "Acceso individual";
@@ -487,8 +498,8 @@
 
     async function cargarProgreso(email, plan) {
       const cursos = plan === "completo"
-        ? ["personal", "nutricion", "hiit", "musculacion"]
-        : (plan ? [plan] : []);
+        ? [...CURSOS_VALIDOS]
+        : (plan === "multi" ? cursosConfirmadosActuales : (plan ? [plan] : []));
 
       if (cursos.length === 0) {
         document.getElementById("progreso-descripcion").innerText = "Tu acceso todavía no fue activado.";

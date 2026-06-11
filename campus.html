@@ -371,6 +371,7 @@
     };
 
     const CURSOS_VALIDOS = Object.keys(NOMBRES_CURSO);
+    const EMAIL_ACCESO_INTERNO = "santiagovigolo7@gmail.com";
     let cursosConfirmadosActuales = [];
 
     function formatPlanName(plan) {
@@ -388,6 +389,11 @@
     }
 
     async function obtenerPlanConfirmado(email) {
+      if ((email || "").toLowerCase() === EMAIL_ACCESO_INTERNO) {
+        cursosConfirmadosActuales = [...CURSOS_VALIDOS];
+        return "completo";
+      }
+
       const { data, error } = await supabaseClient
         .from("progreso_alumnos")
         .select("curso")

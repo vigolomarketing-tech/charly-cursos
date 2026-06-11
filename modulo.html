@@ -1115,9 +1115,15 @@
     const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     const CURSOS_VALIDOS = ["personal", "nutricion", "hiit", "musculacion"];
+    const EMAIL_ACCESO_INTERNO = "santiagovigolo7@gmail.com";
     let cursosConfirmadosActuales = [];
 
     async function obtenerPlanConfirmado(email) {
+      if ((email || "").toLowerCase() === EMAIL_ACCESO_INTERNO) {
+        cursosConfirmadosActuales = [...CURSOS_VALIDOS];
+        return "completo";
+      }
+
       const { data, error } = await supabaseClient
         .from("progreso_alumnos")
         .select("curso")

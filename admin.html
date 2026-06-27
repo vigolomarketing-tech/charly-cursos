@@ -39,12 +39,23 @@
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     textarea{width:100%;margin-top:12px;border:none;border-radius:12px;padding:12px;box-sizing:border-box;font-family:inherit;min-height:82px;resize:vertical}
     .card-message{margin-top:10px;color:#86efac;font-size:14px;min-height:18px}
+    .tag-archivado{color:#8a8a8a;border-color:rgba(138,138,138,.35);background:rgba(138,138,138,.10)}
+    .acceso-panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:16px;margin-bottom:16px}
+    .acceso-panel h2{margin:0 0 12px;font-size:17px}
+    .acceso-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+    .acceso-form input,.acceso-form select{flex:1;min-width:180px;padding:10px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:white;font-family:inherit;font-size:14px}
+    .acceso-form select option{background:#0e1117;color:white}
+    .acceso-msg{margin-top:10px;font-size:14px;min-height:18px}
+    .btn-archive{background:rgba(148,163,184,.10);border-color:rgba(148,163,184,.25);color:rgba(255,255,255,.65)}
 
     @media (max-width: 640px){
       .container{width:min(94%,1100px);padding:18px 0 32px}
       .top,.top-actions,.actions{display:grid;grid-template-columns:1fr;width:100%}
       .btn{width:100%;min-height:42px;white-space:normal;text-align:center}
       .panel{padding:14px;border-radius:16px}
+      .acceso-panel{padding:14px;border-radius:16px}
+      .acceso-form{flex-direction:column}
+      .acceso-form input,.acceso-form select,.acceso-form .btn{width:100%}
       .card{padding:14px;border-radius:16px}
       .card-top{display:grid;grid-template-columns:1fr;gap:10px}
       .tag{width:max-content;max-width:100%}
@@ -62,8 +73,27 @@
     </div>
     <div class="top-actions">
       <a class="btn" href="campus.html">Volver al campus</a>
+      <button class="btn" onclick="toggleArchivadas()">Ver archivadas</button>
       <button class="btn btn-primary" onclick="cargarEntregas()">Actualizar</button>
     </div>
+  </div>
+
+  <!-- Otorgar acceso manual -->
+  <div class="acceso-panel">
+    <h2>Otorgar acceso manual</h2>
+    <div class="acceso-form">
+      <input id="acceso-email" type="email" placeholder="Email del alumno" autocomplete="off" />
+      <select id="acceso-plan">
+        <option value="">— Seleccionar plan —</option>
+        <option value="pack_completo">Pack Completo (4 cursos)</option>
+        <option value="personal_trainer">Personal Trainer</option>
+        <option value="funcional_hiit">Funcional & HIIT</option>
+        <option value="musculacion">Musculación</option>
+        <option value="nutricion">Nutrición Deportiva</option>
+      </select>
+      <button class="btn btn-primary" onclick="otorgarAcceso()">Otorgar acceso</button>
+    </div>
+    <div id="acceso-msg" class="acceso-msg"></div>
   </div>
 
   <div class="panel">
@@ -78,8 +108,17 @@ const supabaseKey = "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d";
 const ADMIN_EMAIL = "fitnesstrainingzone16@gmail.com";
 const QUERY_TIMEOUT_MS = 15000;
 
+const CURSOS_POR_PLAN = {
+  pack_completo: ["personal", "nutricion", "hiit", "musculacion"],
+  personal_trainer: ["personal"],
+  funcional_hiit: ["hiit"],
+  musculacion: ["musculacion"],
+  nutricion: ["nutricion"],
+};
+
 let supabaseClient = null;
 let adminValidado = null;
+let mostrarArchivadas = false;
 
 function obtenerElemento(id){
   const elemento = document.getElementById(id);
@@ -220,10 +259,14 @@ async function cargarEntregas(){
   listaEl().innerHTML = "";
 
   try {
-    const consulta = supabaseClient
+    let consulta = supabaseClient
       .from("entregas")
       .select("id,user_email,nombre,curso,archivo_url,comentario,estado,created_at")
       .order("created_at", { ascending:false });
+
+    if(!mostrarArchivadas){
+      consulta = consulta.neq("estado", "archivado");
+    }
 
     const { data, error } = await conTimeout(consulta, "consulta public.entregas");
     if(error) throw error;
@@ -232,6 +275,13 @@ async function cargarEntregas(){
   } catch(error) {
     mostrarError("Error cargando entregas desde Supabase", error);
   }
+}
+
+function toggleArchivadas(){
+  mostrarArchivadas = !mostrarArchivadas;
+  const btn = document.querySelector(".top-actions button");
+  if(btn) btn.textContent = mostrarArchivadas ? "Ocultar archivadas" : "Ver archivadas";
+  cargarEntregas();
 }
 
 function renderizarEntregas(entregas){
@@ -274,6 +324,7 @@ function renderizarEntregas(entregas){
         <button class="btn btn-ok" onclick="actualizarEstado('${id}', 'aprobado')">Aprobar entrega</button>
         <button class="btn btn-bad" onclick="actualizarEstado('${id}', 'corregir')">Pedir correccion</button>
         <button class="btn" onclick="actualizarEstado('${id}', 'pendiente')">Pendiente</button>
+        ${estado === "aprobado" ? `<button class="btn btn-archive" onclick="archivarEntrega('${id}')">Archivar</button>` : ""}
       </div>
 
       <textarea id="comentario-${id}" placeholder="Escribí observaciones para el alumno...">${escapeHtml(entrega.comentario || "")}</textarea>
@@ -358,6 +409,87 @@ function actualizarTarjeta(id, cambios){
         if(mensaje.innerText === cambios.mensaje) mensaje.innerText = "";
       }, 3000);
     }
+  }
+}
+
+async function otorgarAcceso(){
+  if(!adminValidado){
+    const autorizado = await protegerAdmin();
+    if(!autorizado) return;
+  }
+
+  const emailInput = document.getElementById("acceso-email");
+  const planSelect = document.getElementById("acceso-plan");
+  const msgEl = document.getElementById("acceso-msg");
+
+  const email = (emailInput.value || "").trim().toLowerCase();
+  const plan = planSelect.value;
+
+  if(!email || !plan){
+    msgEl.style.color = "#fca5a5";
+    msgEl.textContent = "Completá el email y el plan.";
+    return;
+  }
+
+  const cursos = CURSOS_POR_PLAN[plan];
+  if(!cursos){
+    msgEl.style.color = "#fca5a5";
+    msgEl.textContent = "Plan no reconocido.";
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const rows = cursos.map(curso => ({
+    user_email: email,
+    curso,
+    clase_actual: 1,
+    updated_at: now,
+  }));
+
+  msgEl.style.color = "rgba(255,255,255,.62)";
+  msgEl.textContent = "Guardando...";
+
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from("progreso_alumnos").upsert(rows, {
+        onConflict: "user_email,curso",
+        ignoreDuplicates: false,
+      }),
+      "otorgar acceso"
+    );
+    if(error) throw error;
+
+    msgEl.style.color = "#86efac";
+    msgEl.textContent = `Acceso otorgado: ${email} → ${cursos.join(", ")}`;
+    emailInput.value = "";
+    planSelect.value = "";
+  } catch(error){
+    msgEl.style.color = "#fca5a5";
+    msgEl.textContent = "Error: " + detalleError(error);
+    console.error("[admin] otorgarAcceso", error);
+  }
+}
+
+async function archivarEntrega(id){
+  if(!adminValidado){
+    const autorizado = await protegerAdmin();
+    if(!autorizado) return;
+  }
+
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from("entregas").update({ estado: "archivado" }).eq("id", id),
+      "archivar entrega"
+    );
+    if(error) throw error;
+
+    const card = Array.from(document.querySelectorAll(".card"))
+      .find(c => c.dataset.id === String(id));
+    if(card) card.remove();
+
+    mostrarStatus("Entrega archivada.", "ok");
+  } catch(error){
+    mostrarError("Error archivando entrega", error);
   }
 }
 

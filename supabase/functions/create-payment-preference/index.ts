@@ -22,9 +22,9 @@ const PLANS: Record<string, { title: string; prices: Record<number, number> }> =
       title: "Personal Trainer",
       prices: { 1: 68000, 3: 76000, 6: 86000 },
     },
-    funcional_hiit: { title: "Funcional & HIIT", prices: { 1: 34000 } },
-    musculacion: { title: "Musculación", prices: { 1: 34000 } },
-    nutricion: { title: "Nutrición Deportiva", prices: { 1: 34000 } },
+    funcional_hiit: { title: "Funcional & HIIT", prices: { 1: 34000, 3: 38000, 6: 43000 } },
+    musculacion: { title: "Musculación", prices: { 1: 34000, 3: 38000, 6: 43000 } },
+    nutricion: { title: "Nutrición Deportiva", prices: { 1: 34000, 3: 38000, 6: 43000 } },
   };
 
 function jsonResponse(body: unknown, status = 200) {
@@ -81,11 +81,13 @@ Deno.serve(async (req) => {
       pending: `${SITE}/campus.html`,
     },
     auto_return: "approved",
+    // installments inside payment_methods: sets max allowed and pre-selects the count.
+    // For pago único (qty=1) this prevents the buyer from switching to installments at the base price.
+    payment_methods: {
+      installments: qty,
+      default_installments: qty,
+    },
   };
-
-  if (qty > 1) {
-    preference.installments = qty;
-  }
 
   const res = await fetch("https://api.mercadopago.com/checkout/preferences", {
     method: "POST",

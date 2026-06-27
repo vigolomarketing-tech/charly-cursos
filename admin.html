@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Panel Admin | FTZ Campus</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *{box-sizing:border-box}
@@ -340,8 +340,8 @@ async function protegerAdmin() {
     return true;
   } catch (err) {
     const d = detalleError(err);
-    mostrarStatus(d.includes("sesi") ? "No hay sesión. Redirigiendo..." : "Error: " + d, "error");
-    if (d.includes("sesi")) setTimeout(() => { window.location.href = "login.html"; }, 1400);
+    mostrarStatus(d.includes("sesión") ? "No hay sesión. Redirigiendo..." : "Error: " + d, "error");
+    if (d.includes("sesión")) setTimeout(() => { window.location.href = "login.html"; }, 1400);
     return false;
   }
 }
@@ -498,9 +498,12 @@ function renderizarEntregas() {
 function actualizarTarjetaInPlace(id, nuevoEstado, archivoUrl) {
   const card = Array.from(document.querySelectorAll(".card")).find(c => c.dataset.id === String(id));
   if (!card) return;
+
   const estado = etiquetaEstado(nuevoEstado);
+
   const tag = card.querySelector("[data-role='estado']");
   if (tag) { tag.className = estadoClase(estado); tag.textContent = estado; }
+
   const accionesEl = card.querySelector("[data-role='acciones']");
   if (accionesEl) {
     const url = archivoUrl || card.querySelector("a.btn-primary")?.getAttribute("href") || "#";
@@ -511,24 +514,32 @@ function actualizarTarjetaInPlace(id, nuevoEstado, archivoUrl) {
 /* ——— ACTIONS ——— */
 async function actualizarEstado(id, estado) {
   if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+
   const card = Array.from(document.querySelectorAll(".card")).find(c => c.dataset.id === String(id));
   const btns = card?.querySelectorAll("button");
   if (btns) btns.forEach(b => b.disabled = true);
+
   try {
     const { error } = await conTimeout(
       supabaseClient.from("entregas").update({ estado }).eq("id", id),
       "actualizar estado"
     );
     if (error) throw error;
+
     const idx = todasLasEntregas.findIndex(e => String(e.id) === String(id));
     if (idx >= 0) {
       todasLasEntregas[idx].estado = estado;
       actualizarTarjetaInPlace(id, estado, todasLasEntregas[idx].archivo_url);
     }
+
+    // If the current filter doesn't match new state, check if card should be hidden
     if (filtroActual !== "todos") {
       const etiq = etiquetaEstado(estado);
-      if (etiq !== filtroActual && estado !== filtroActual) card?.remove();
+      if (etiq !== filtroActual && estado !== filtroActual) {
+        card?.remove();
+      }
     }
+
     cargarStats();
     toast("Estado actualizado: " + etiquetaEstado(estado));
   } catch (err) {
@@ -540,10 +551,12 @@ async function actualizarEstado(id, estado) {
 
 async function guardarComentario(id) {
   if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+
   const textarea = $id("comentario-" + id);
   const comentario = textarea?.value || "";
   const btn = document.querySelector(`.card[data-id="${id}"] button[onclick*="guardarComentario"]`);
   if (btn) { btn.disabled = true; btn.textContent = "Guardando..."; }
+
   try {
     const { error } = await conTimeout(
       supabaseClient.from("entregas").update({ comentario }).eq("id", id),
@@ -628,21 +641,32 @@ function cambiarTabAcceso(tab, btn) {
 
 async function otorgarAcceso() {
   if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+
   const emailInput = $id("acceso-email");
   const planSelect = $id("acceso-plan");
   const msgEl = $id("acceso-msg");
   const btn = $id("btn-otorgar");
+
   const email = (emailInput.value || "").trim().toLowerCase();
   const plan = planSelect.value;
-  if (!email || !plan) { msgEl.style.color = "#fca5a5"; msgEl.textContent = "Completá el email y el plan."; return; }
+
+  if (!email || !plan) {
+    msgEl.style.color = "#fca5a5";
+    msgEl.textContent = "Completá el email y el plan.";
+    return;
+  }
+
   const cursos = CURSOS_POR_PLAN[plan];
   if (!cursos) { msgEl.style.color = "#fca5a5"; msgEl.textContent = "Plan no reconocido."; return; }
+
   btn.disabled = true;
   btn.textContent = "Guardando...";
   msgEl.style.color = "rgba(255,255,255,.55)";
   msgEl.textContent = "Guardando...";
+
   const now = new Date().toISOString();
   const rows = cursos.map(curso => ({ user_email: email, curso, clase_actual: 1, updated_at: now }));
+
   try {
     const { error } = await conTimeout(
       supabaseClient.from("progreso_alumnos").upsert(rows, { onConflict: "user_email,curso", ignoreDuplicates: false }),
@@ -669,7 +693,13 @@ function pedirConfirmarRevocacion() {
   const email = ($id("revocar-email")?.value || "").trim().toLowerCase();
   const plan = $id("revocar-plan")?.value || "";
   const msgEl = $id("acceso-msg");
-  if (!email || !plan) { msgEl.style.color = "#fca5a5"; msgEl.textContent = "Completá el email y el plan."; return; }
+
+  if (!email || !plan) {
+    msgEl.style.color = "#fca5a5";
+    msgEl.textContent = "Completá el email y el plan.";
+    return;
+  }
+
   const nombrePlan = plan.replace(/_/g, " ");
   mostrarModal(
     "Revocar acceso",
@@ -682,12 +712,14 @@ function pedirConfirmarRevocacion() {
 
 async function revocarAcceso(email, plan) {
   if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+
   const msgEl = $id("acceso-msg");
   const btn = $id("btn-revocar");
   btn.disabled = true;
   btn.textContent = "Revocando...";
   msgEl.style.color = "rgba(255,255,255,.55)";
   msgEl.textContent = "Revocando acceso...";
+
   const cursos = CURSOS_POR_PLAN[plan];
   if (!cursos) {
     msgEl.style.color = "#fca5a5";
@@ -696,6 +728,7 @@ async function revocarAcceso(email, plan) {
     btn.textContent = "Revocar acceso";
     return;
   }
+
   try {
     const { error } = await conTimeout(
       supabaseClient.from("progreso_alumnos").delete()
@@ -732,6 +765,6 @@ async function iniciarAdmin() {
 }
 
 iniciarAdmin();
-<\/script>
+</script>
 </body>
 </html>

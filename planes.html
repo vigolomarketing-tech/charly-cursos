@@ -292,6 +292,9 @@
       .plans{grid-template-columns:1fr}
       .plans-bottom{grid-template-columns:1fr}
     }
+
+    button.btn{font-family:inherit;font-size:14px}
+    .btn[disabled]{opacity:.6;cursor:not-allowed;transform:none}
   </style>
 </head>
 <body>
@@ -349,15 +352,15 @@
               <li>Materiales, actividades y campus completo</li>
             </ul>
             <div class="payment-options">
-              <a class="btn btn--primary btn--full" href="https://mpago.la/1mDQ523" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+              <button class="btn btn--primary btn--full" onclick="pagar('completo', 1, this)">
                 Pago único - $136.000
-              </a>
-              <a class="btn btn--full" href="https://mpago.li/33DE42R" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+              </button>
+              <button class="btn btn--full" onclick="pagar('completo', 3, this)">
                 3 cuotas sin interés - $152.000
-              </a>
-              <a class="btn btn--full" href="https://mpago.li/2bSfCqh" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+              </button>
+              <button class="btn btn--full" onclick="pagar('completo', 6, this)">
                 6 cuotas sin interés - $172.000
-              </a>
+              </button>
             </div>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
@@ -377,15 +380,15 @@
               <li>Trabajo final</li>
             </ul>
             <div class="payment-options">
-              <a class="btn btn--primary btn--full" href="https://mpago.la/1XnC57Y" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+              <button class="btn btn--primary btn--full" onclick="pagar('personal', 1, this)">
                 Pago único - $68.000
-              </a>
-              <a class="btn btn--full" href="https://mpago.li/1wTb3PR" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+              </button>
+              <button class="btn btn--full" onclick="pagar('personal', 3, this)">
                 3 cuotas sin interés - $76.000
-              </a>
-              <a class="btn btn--full" href="https://mpago.li/18Xp5ha" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+              </button>
+              <button class="btn btn--full" onclick="pagar('personal', 6, this)">
                 6 cuotas sin interés - $86.000
-              </a>
+              </button>
             </div>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
@@ -403,9 +406,9 @@
               <li>Armado de rutinas</li>
               <li>Manual y trabajo final</li>
             </ul>
-            <a class="btn btn--primary btn--full" href="https://mpago.la/2258v4h" onclick="return guardarPlanYRedirigir(event, 'hiit', this.href)">
+            <button class="btn btn--primary btn--full" onclick="pagar('hiit', 1, this)">
               Pago único - $34.000
-            </a>
+            </button>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
         </div>
@@ -427,9 +430,9 @@
               <li>Guía de movimientos</li>
               <li>Trabajo final</li>
             </ul>
-            <a class="btn btn--primary btn--full" href="https://mpago.la/24ZjDXL" onclick="return guardarPlanYRedirigir(event, 'musculacion', this.href)">
+            <button class="btn btn--primary btn--full" onclick="pagar('musculacion', 1, this)">
               Pago único - $34.000
-            </a>
+            </button>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
 
@@ -447,9 +450,9 @@
               <li>Materiales descargables</li>
               <li>Trabajo final</li>
             </ul>
-            <a class="btn btn--primary btn--full" href="https://mpago.la/2QcmAFr" onclick="return guardarPlanYRedirigir(event, 'nutricion', this.href)">
+            <button class="btn btn--primary btn--full" onclick="pagar('nutricion', 1, this)">
               Pago único - $34.000
-            </a>
+            </button>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
           </div>
 
@@ -464,12 +467,42 @@
   </main>
 
   <script>
-    function guardarPlanYRedirigir(event, plan, url) {
-      event.preventDefault();
-      localStorage.setItem("plan_preseleccionado", plan);
-      localStorage.removeItem("plan");
-      window.location.href = url;
-      return false;
+    const PREFERENCE_URL =
+      "https://yfdiejyrhaaziceyeiuc.supabase.co/functions/v1/create-payment-preference";
+
+    const PLAN_MAP = {
+      completo: "pack_completo",
+      personal: "personal_trainer",
+      hiit: "funcional_hiit",
+      musculacion: "musculacion",
+      nutricion: "nutricion",
+    };
+
+    async function pagar(planKey, installments, btn) {
+      const plan = PLAN_MAP[planKey] || planKey;
+      const texto = btn.textContent.trim();
+      btn.disabled = true;
+      btn.textContent = "Procesando...";
+
+      try {
+        const res = await fetch(PREFERENCE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan, installments }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.init_point) {
+          throw new Error(data.error || "Error al crear el pago");
+        }
+        localStorage.setItem("plan_preseleccionado", planKey);
+        localStorage.removeItem("plan");
+        window.location.href = data.init_point;
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = texto;
+        alert("No se pudo iniciar el pago. Intentá de nuevo.");
+        console.error(err);
+      }
     }
   </script>
 

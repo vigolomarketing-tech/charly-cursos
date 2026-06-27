@@ -1,2 +1,5 @@
 [functions.mercado-pago-webhook]
 verify_jwt = false
+
+[functions.create-payment-preference]
+verify_jwt = false

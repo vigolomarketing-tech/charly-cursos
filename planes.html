@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elegí tu plan | FTZ Campus</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
@@ -349,13 +350,13 @@
               <li>Materiales, actividades y campus completo</li>
             </ul>
             <div class="payment-options">
-              <a class="btn btn--primary btn--full" href="https://mpago.la/1mDQ523" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+              <a class="btn btn--primary btn--full" href="https://mpago.la/1mDQ523" onclick="return guardarPlanYRedirigir(event, 'pack_completo', 'pago_unico')">
                 Pago único - $136.000
               </a>
-              <a class="btn btn--full" href="https://mpago.li/33DE42R" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+              <a class="btn btn--full" href="https://mpago.li/33DE42R" onclick="return guardarPlanYRedirigir(event, 'pack_completo', 'tres_cuotas')">
                 3 cuotas sin interés - $152.000
               </a>
-              <a class="btn btn--full" href="https://mpago.li/2bSfCqh" onclick="return guardarPlanYRedirigir(event, 'completo', this.href)">
+              <a class="btn btn--full" href="https://mpago.li/2bSfCqh" onclick="return guardarPlanYRedirigir(event, 'pack_completo', 'seis_cuotas')">
                 6 cuotas sin interés - $172.000
               </a>
             </div>
@@ -377,13 +378,13 @@
               <li>Trabajo final</li>
             </ul>
             <div class="payment-options">
-              <a class="btn btn--primary btn--full" href="https://mpago.la/1XnC57Y" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+              <a class="btn btn--primary btn--full" href="https://mpago.la/1XnC57Y" onclick="return guardarPlanYRedirigir(event, 'personal_trainer', 'pago_unico')">
                 Pago único - $68.000
               </a>
-              <a class="btn btn--full" href="https://mpago.li/1wTb3PR" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+              <a class="btn btn--full" href="https://mpago.li/1wTb3PR" onclick="return guardarPlanYRedirigir(event, 'personal_trainer', 'tres_cuotas')">
                 3 cuotas sin interés - $76.000
               </a>
-              <a class="btn btn--full" href="https://mpago.li/18Xp5ha" onclick="return guardarPlanYRedirigir(event, 'personal', this.href)">
+              <a class="btn btn--full" href="https://mpago.li/18Xp5ha" onclick="return guardarPlanYRedirigir(event, 'personal_trainer', 'seis_cuotas')">
                 6 cuotas sin interés - $86.000
               </a>
             </div>
@@ -403,7 +404,7 @@
               <li>Armado de rutinas</li>
               <li>Manual y trabajo final</li>
             </ul>
-            <a class="btn btn--primary btn--full" href="https://mpago.la/2258v4h" onclick="return guardarPlanYRedirigir(event, 'hiit', this.href)">
+            <a class="btn btn--primary btn--full" href="https://mpago.la/2258v4h" onclick="return guardarPlanYRedirigir(event, 'funcional_hiit', 'pago_unico')">
               Pago único - $34.000
             </a>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
@@ -427,7 +428,7 @@
               <li>Guía de movimientos</li>
               <li>Trabajo final</li>
             </ul>
-            <a class="btn btn--primary btn--full" href="https://mpago.la/24ZjDXL" onclick="return guardarPlanYRedirigir(event, 'musculacion', this.href)">
+            <a class="btn btn--primary btn--full" href="https://mpago.la/24ZjDXL" onclick="return guardarPlanYRedirigir(event, 'musculacion', 'pago_unico')">
               Pago único - $34.000
             </a>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
@@ -447,7 +448,7 @@
               <li>Materiales descargables</li>
               <li>Trabajo final</li>
             </ul>
-            <a class="btn btn--primary btn--full" href="https://mpago.la/2QcmAFr" onclick="return guardarPlanYRedirigir(event, 'nutricion', this.href)">
+            <a class="btn btn--primary btn--full" href="https://mpago.la/2QcmAFr" onclick="return guardarPlanYRedirigir(event, 'nutricion', 'pago_unico')">
               Pago único - $34.000
             </a>
             <p class="plan-note">Pago seguro vía Mercado Pago</p>
@@ -464,11 +465,64 @@
   </main>
 
   <script>
-    function guardarPlanYRedirigir(event, plan, url) {
+    const supabaseClient = window.supabase.createClient(
+      "https://yfdiejyrhaaziceyeiuc.supabase.co",
+      "sb_publishable_fRXqVXDILy3hgUFvp341pA_qqZdcQ_d"
+    );
+    const CREATE_PAYMENT_PREFERENCE_URL = "https://yfdiejyrhaaziceyeiuc.supabase.co/functions/v1/create-payment-preference";
+    const PLAN_PRESELECCIONADO = {
+      pack_completo: "completo",
+      personal_trainer: "personal",
+      nutricion: "nutricion",
+      funcional_hiit: "hiit",
+      musculacion: "musculacion"
+    };
+
+    async function guardarPlanYRedirigir(event, plan, priceOption) {
       event.preventDefault();
-      localStorage.setItem("plan_preseleccionado", plan);
+      const planPreseleccionado = PLAN_PRESELECCIONADO[plan] || plan;
+      localStorage.setItem("plan_preseleccionado", planPreseleccionado);
       localStorage.removeItem("plan");
-      window.location.href = url;
+
+      const boton = event.currentTarget;
+      const textoOriginal = boton.innerText;
+      boton.innerText = "Preparando pago...";
+      boton.style.pointerEvents = "none";
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session || !session.user?.email) {
+          alert("Iniciá sesión o registrate antes de pagar para activar tu acceso automáticamente.");
+          window.location.href = "login.html";
+          return false;
+        }
+
+        const response = await fetch(CREATE_PAYMENT_PREFERENCE_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + session.access_token
+          },
+          body: JSON.stringify({
+            plan,
+            price_option: priceOption,
+            email: session.user.email
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.init_point) {
+          throw new Error(data.error || "No se pudo crear el pago.");
+        }
+
+        window.location.href = data.init_point;
+      } catch (error) {
+        alert("No se pudo iniciar el pago automático. Intentá nuevamente o contactá al equipo de FTZ.");
+        console.error("Error creando preferencia de Mercado Pago", error);
+        boton.innerText = textoOriginal;
+        boton.style.pointerEvents = "";
+      }
+
       return false;
     }
   </script>

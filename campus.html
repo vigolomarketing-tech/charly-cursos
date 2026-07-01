@@ -240,6 +240,8 @@
     .anuncio__btn--info{background:rgba(96,214,255,.14);border-color:rgba(96,214,255,.28);color:#8be9ff}
     .anuncio__btn--novedad{background:rgba(34,197,94,.13);border-color:rgba(34,197,94,.28);color:#86efac}
     .anuncios-empty{text-align:center;padding:24px;color:rgba(255,255,255,.45);font-size:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px}
+    .anuncios-indicator{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(96,214,255,.12);border:1px solid rgba(96,214,255,.25);color:#8be9ff;font-size:13px;font-weight:700;transition:opacity .3s ease}
+    .anuncios-section__head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
 
     @media (max-width:980px){
       .hero__grid{grid-template-columns:1fr}
@@ -319,8 +321,9 @@
     <!-- CENTRO DE ANUNCIOS -->
     <section class="section anuncios-section" id="anuncios-section" style="display:none">
       <div class="container">
-        <div class="section__head">
-          <h2>📢 Centro de anuncios</h2>
+        <div class="anuncios-section__head">
+          <h2 style="margin:0">📢 Centro de anuncios</h2>
+          <div id="anuncios-indicator" class="anuncios-indicator" style="display:none">🔔 <span id="anuncios-nuevos-count">0</span> anuncio<span id="anuncios-nuevos-plural">s</span> nuevo<span id="anuncios-nuevos-plural2">s</span></div>
         </div>
         <div id="anuncios-lista" class="anuncios-grid"></div>
       </div>
@@ -550,25 +553,27 @@
         return;
       }
 
-      let totalClases = 0;
-      let totalDesbloqueadas = 0;
       const contenedor = document.getElementById("progreso-cursos");
       contenedor.innerHTML = "";
+
+      // Single batch query — eliminates N+1 pattern
+      const { data: progresoData } = await supabaseClient
+        .from("progreso_alumnos")
+        .select("curso, clase_actual")
+        .eq("user_email", email)
+        .in("curso", cursos);
+
+      const progresoMap = {};
+      (progresoData || []).forEach(r => { progresoMap[r.curso] = r.clase_actual || 1; });
+
+      let totalClases = 0;
+      let totalDesbloqueadas = 0;
 
       for (const curso of cursos) {
         const max = MAX_CLASES[curso] || 1;
         totalClases += max;
-
-        const { data } = await supabaseClient
-          .from("progreso_alumnos")
-          .select("clase_actual")
-          .eq("user_email", email)
-          .eq("curso", curso)
-          .maybeSingle();
-
-        const claseActual = data?.clase_actual || 1;
+        const claseActual = progresoMap[curso] || 1;
         totalDesbloqueadas += claseActual;
-
         const pct = Math.round((claseActual / max) * 100);
 
         const item = document.createElement("div");
@@ -594,6 +599,8 @@
         .replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[c]);
     }
 
+    const ICONO_PREFIJOS = {zoom:'📹 ', pdf:'📄 ', ebook:'📚 ', drive:'📂 ', video:'🎬 ', link:'🔗 '};
+
     function renderAnuncio(a) {
       const tipo = a.tipo || 'info';
       const fijadoClass = a.fijado ? ' anuncio--fijado' : '';
@@ -602,8 +609,9 @@
         : '';
       const LABELS = {urgente:'🔴 Urgente', importante:'🟡 Importante', info:'🔵 Información', novedad:'🟢 Novedad'};
       const tipoSafe = ['urgente','importante','info','novedad'].includes(tipo) ? tipo : 'info';
+      const iconoPrefix = a.boton_icono && ICONO_PREFIJOS[a.boton_icono] ? ICONO_PREFIJOS[a.boton_icono] : '';
       const boton = (a.boton_texto && a.boton_url)
-        ? `<a class="anuncio__btn anuncio__btn--${tipoSafe}" href="${esc(a.boton_url)}" target="_blank" rel="noopener noreferrer">${esc(a.boton_texto)}</a>`
+        ? `<a class="anuncio__btn anuncio__btn--${tipoSafe}" href="${esc(a.boton_url)}" target="_blank" rel="noopener noreferrer">${iconoPrefix}${esc(a.boton_texto)}</a>`
         : '';
       return `<div class="anuncio anuncio--${tipoSafe}${fijadoClass}">
         <span class="anuncio__badge badge--${tipoSafe}">${LABELS[tipo] || esc(tipo)}</span>
@@ -629,8 +637,9 @@
       try {
         const { data, error } = await supabaseClient
           .from('anuncios')
-          .select('id,titulo,mensaje,tipo,boton_texto,boton_url,destinatario,fijado,publicado_en')
-          .in('destinatario', destinos);
+          .select('id,titulo,mensaje,tipo,boton_texto,boton_url,boton_icono,destinatario,fijado,publicado_en')
+          .in('destinatario', destinos)
+          .limit(50);
 
         if (error) throw error;
 
@@ -647,6 +656,42 @@
           : '<div class="anuncios-empty">No hay anuncios nuevos por ahora.</div>';
 
         section.style.display = '';
+
+        if (ordenados.length > 0) {
+          const ids = ordenados.map(a => a.id);
+          const { data: vistos } = await supabaseClient
+            .from('anuncios_vistos')
+            .select('anuncio_id')
+            .in('anuncio_id', ids);
+
+          const vistosSet = new Set((vistos || []).map(v => v.anuncio_id));
+          const nuevos = ids.filter(id => !vistosSet.has(id));
+
+          if (nuevos.length > 0) {
+            const indicator = document.getElementById('anuncios-indicator');
+            const countEl = document.getElementById('anuncios-nuevos-count');
+            const pluralEl = document.getElementById('anuncios-nuevos-plural');
+            const plural2El = document.getElementById('anuncios-nuevos-plural2');
+            if (indicator && countEl) {
+              countEl.textContent = nuevos.length;
+              if (pluralEl) pluralEl.textContent = nuevos.length === 1 ? '' : 's';
+              if (plural2El) plural2El.textContent = nuevos.length === 1 ? '' : 's';
+              indicator.style.display = '';
+            }
+
+            setTimeout(async () => {
+              try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const email = session?.user?.email;
+                if (!email) return;
+                const rows = nuevos.map(anuncio_id => ({ anuncio_id, user_email: email }));
+                await supabaseClient.from('anuncios_vistos').upsert(rows, { onConflict: 'user_email,anuncio_id', ignoreDuplicates: true });
+                const ind = document.getElementById('anuncios-indicator');
+                if (ind) { ind.style.opacity = '0'; setTimeout(() => { ind.style.display = 'none'; }, 300); }
+              } catch (e) { console.warn('[campus] marcar visto:', e); }
+            }, 4000);
+          }
+        }
       } catch (err) {
         console.error('[campus] anuncios:', err);
       }

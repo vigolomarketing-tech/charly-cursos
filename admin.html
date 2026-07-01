@@ -121,6 +121,14 @@
     .checkbox-row{display:inline-flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;user-select:none}
     .checkbox-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:#60d6ff;flex-shrink:0}
     .card-anuncio-dim{opacity:.5}
+    .anuncios-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px}
+    .astat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px 8px;text-align:center}
+    .astat strong{display:block;font-size:18px;font-weight:900;margin-bottom:2px}
+    .astat span{color:rgba(255,255,255,.48);font-size:11px}
+    .preview-anuncio-wrap{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02);padding:14px;margin-top:4px}
+    .preview-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.42);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+    .tag-programado{color:#c4b5fd;border-color:rgba(196,181,253,.35);background:rgba(196,181,253,.10)}
+    @media(max-width:760px){.anuncios-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
     /* MOBILE */
     @media(max-width:900px){
@@ -253,29 +261,42 @@
 
   <!-- GESTIONAR ANUNCIOS -->
   <div class="panel" id="panel-anuncios" style="margin-top:16px">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
       <div class="panel-title" style="margin:0">📢 Gestionar anuncios</div>
       <button class="btn btn-primary" onclick="mostrarFormAnuncio(null)">+ Nuevo anuncio</button>
+    </div>
+
+    <!-- ANNOUNCEMENT STATS -->
+    <div class="anuncios-stats" id="anuncios-stats">
+      <div class="astat"><strong id="ast-total">—</strong><span>Total</span></div>
+      <div class="astat"><strong id="ast-activos">—</strong><span>Activos</span></div>
+      <div class="astat"><strong id="ast-urgentes">—</strong><span>Urgentes</span></div>
+      <div class="astat"><strong id="ast-programados">—</strong><span>Programados</span></div>
+      <div class="astat"><strong id="ast-fijados">—</strong><span>Fijados</span></div>
+      <div class="astat"><strong id="ast-archivados">—</strong><span>Archivados</span></div>
     </div>
 
     <!-- CREATE / EDIT FORM -->
     <div class="form-anuncio" id="form-anuncio">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)">
         <strong id="form-anuncio-titulo">Nuevo anuncio</strong>
-        <button class="btn" onclick="ocultarFormAnuncio()" style="padding:6px 12px;font-size:13px">✕ Cancelar</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="togglePreviewAnuncio()" style="padding:6px 12px;font-size:13px">👁 Preview</button>
+          <button class="btn" onclick="ocultarFormAnuncio()" style="padding:6px 12px;font-size:13px">✕ Cancelar</button>
+        </div>
       </div>
       <div class="form-field">
         <span class="form-label">Título *</span>
-        <input id="an-titulo" type="text" placeholder="Título del anuncio" maxlength="120" />
+        <input id="an-titulo" type="text" placeholder="Título del anuncio" maxlength="120" oninput="actualizarPreview()" />
       </div>
       <div class="form-field">
         <span class="form-label">Mensaje *</span>
-        <textarea id="an-mensaje" placeholder="Escribí el mensaje completo..."></textarea>
+        <textarea id="an-mensaje" placeholder="Escribí el mensaje completo..." oninput="actualizarPreview()"></textarea>
       </div>
       <div class="form-row">
         <div class="form-field">
           <span class="form-label">Tipo</span>
-          <select id="an-tipo">
+          <select id="an-tipo" onchange="actualizarPreview()">
             <option value="info">🔵 Información</option>
             <option value="importante">🟡 Importante</option>
             <option value="urgente">🔴 Urgente</option>
@@ -297,11 +318,29 @@
       <div class="form-row">
         <div class="form-field">
           <span class="form-label">Texto del botón (opcional)</span>
-          <input id="an-boton-texto" type="text" placeholder="Ej: Unirse al Zoom" maxlength="60" />
+          <input id="an-boton-texto" type="text" placeholder="Ej: Unirse al Zoom" maxlength="60" oninput="actualizarPreview()" />
         </div>
         <div class="form-field">
           <span class="form-label">URL del botón (opcional)</span>
-          <input id="an-boton-url" type="url" placeholder="https://..." />
+          <input id="an-boton-url" type="url" placeholder="https://..." oninput="actualizarPreview()" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <span class="form-label">Ícono del botón</span>
+          <select id="an-boton-icono" onchange="actualizarPreview()">
+            <option value="">Sin ícono</option>
+            <option value="zoom">📹 Zoom / videollamada</option>
+            <option value="pdf">📄 PDF / documento</option>
+            <option value="ebook">📚 Ebook / libro</option>
+            <option value="drive">📂 Drive / carpeta</option>
+            <option value="video">🎬 Video</option>
+            <option value="link">🔗 Enlace</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <span class="form-label">Publicar desde (programado, opcional)</span>
+          <input id="an-publicar-desde" type="datetime-local" />
         </div>
       </div>
       <div class="form-row">
@@ -311,9 +350,16 @@
         </div>
         <div class="form-field" style="flex-direction:row;align-items:flex-end;gap:18px;flex-wrap:wrap">
           <label class="checkbox-row"><input type="checkbox" id="an-activo" checked /> Activo</label>
-          <label class="checkbox-row"><input type="checkbox" id="an-fijado" /> Fijar</label>
+          <label class="checkbox-row"><input type="checkbox" id="an-fijado" onchange="actualizarPreview()" /> Fijar</label>
         </div>
       </div>
+
+      <!-- LIVE PREVIEW -->
+      <div id="preview-anuncio-wrap" class="preview-anuncio-wrap" style="display:none">
+        <div class="preview-label">Preview — así lo verá el alumno</div>
+        <div id="preview-anuncio-content"></div>
+      </div>
+
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-primary" id="btn-guardar-anuncio" onclick="guardarAnuncio()">Publicar anuncio</button>
         <button class="btn" onclick="ocultarFormAnuncio()">Cancelar</button>
@@ -329,6 +375,7 @@
         <button class="filter-tab active" data-af="todos" onclick="cambiarFiltroAnuncios(this)">Todos</button>
         <button class="filter-tab" data-af="activos" onclick="cambiarFiltroAnuncios(this)">Activos</button>
         <button class="filter-tab" data-af="inactivos" onclick="cambiarFiltroAnuncios(this)">Inactivos</button>
+        <button class="filter-tab" data-af="programados" onclick="cambiarFiltroAnuncios(this)">Programados</button>
         <button class="filter-tab" data-af="archivados" onclick="cambiarFiltroAnuncios(this)">Archivados</button>
       </div>
     </div>
@@ -513,7 +560,8 @@ async function cargarEntregas() {
       supabaseClient
         .from("entregas")
         .select("id,user_email,nombre,curso,archivo_url,comentario,estado,created_at")
-        .order("created_at", { ascending: false }),
+        .order("created_at", { ascending: false })
+        .limit(500),
       "cargar entregas"
     );
     if (error) throw error;
@@ -864,9 +912,46 @@ let todosLosAnuncios = [];
 let anuncioEditando = null;
 let filtroAnuncios = "todos";
 let busquedaAnuncios = "";
+let previewVisible = false;
 
 const TIPO_LABELS_A = {urgente:'Urgente', importante:'Importante', info:'Información', novedad:'Novedad'};
 const DEST_LABELS_A = {todos:'Todos', pack_completo:'Pack Completo', personal:'Personal Trainer', nutricion:'Nutrición', hiit:'Funcional & HIIT', musculacion:'Musculación'};
+const ICONO_PREFIJOS_A = {zoom:'📹 ', pdf:'📄 ', ebook:'📚 ', drive:'📂 ', video:'🎬 ', link:'🔗 '};
+
+function actualizarPreview() {
+  if (!previewVisible) return;
+  const tipo = ($id('an-tipo')?.value || 'info');
+  const tipoSafe = ['urgente','importante','info','novedad'].includes(tipo) ? tipo : 'info';
+  const LABELS = {urgente:'🔴 Urgente', importante:'🟡 Importante', info:'🔵 Información', novedad:'🟢 Novedad'};
+  const fijado = $id('an-fijado')?.checked;
+  const titulo = escapeHtml($id('an-titulo')?.value || '(sin título)');
+  const mensaje = escapeHtml($id('an-mensaje')?.value || '');
+  const botonTexto = ($id('an-boton-texto')?.value || '').trim();
+  const botonUrl = ($id('an-boton-url')?.value || '').trim();
+  const icono = $id('an-boton-icono')?.value || '';
+  const iconoPrefix = ICONO_PREFIJOS_A[icono] || '';
+  const COLORS = {urgente:'rgba(239,68,68,.10)',importante:'rgba(251,146,60,.09)',info:'rgba(96,214,255,.07)',novedad:'rgba(34,197,94,.07)'};
+  const BORDERS = {urgente:'rgba(239,68,68,.28)',importante:'rgba(251,146,60,.26)',info:'rgba(96,214,255,.20)',novedad:'rgba(34,197,94,.20)'};
+  const BADGE_COLORS = {urgente:'#fca5a5',importante:'#fdba74',info:'#8be9ff',novedad:'#86efac'};
+  const botonHtml = (botonTexto && botonUrl)
+    ? `<div style="margin-top:10px"><span style="display:inline-block;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;background:rgba(96,214,255,.14);border:1px solid rgba(96,214,255,.28);color:#8be9ff">${iconoPrefix}${escapeHtml(botonTexto)}</span></div>`
+    : '';
+  $id('preview-anuncio-content').innerHTML = `
+    <div style="border-radius:18px;padding:16px;border:1px solid ${BORDERS[tipoSafe]};background:${COLORS[tipoSafe]};position:relative${fijado?' overflow:hidden':''}">
+      ${fijado ? '<span style="position:absolute;top:12px;right:14px;font-size:15px">📌</span>' : ''}
+      <span style="display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase;margin-bottom:10px;border:1px solid;color:${BADGE_COLORS[tipoSafe]}">${LABELS[tipoSafe]}</span>
+      <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;line-height:1.3">${titulo}</h3>
+      <p style="margin:0 0 10px;color:rgba(255,255,255,.78);line-height:1.6;font-size:14px;white-space:pre-line">${mensaje}</p>
+      ${botonHtml}
+    </div>`;
+}
+
+function togglePreviewAnuncio() {
+  previewVisible = !previewVisible;
+  const wrap = $id('preview-anuncio-wrap');
+  if (wrap) wrap.style.display = previewVisible ? '' : 'none';
+  if (previewVisible) actualizarPreview();
+}
 
 function mostrarFormAnuncio(id) {
   anuncioEditando = id || null;
@@ -882,6 +967,8 @@ function mostrarFormAnuncio(id) {
     $id('an-destinatario').value = a.destinatario || 'todos';
     $id('an-boton-texto').value = a.boton_texto || '';
     $id('an-boton-url').value = a.boton_url || '';
+    $id('an-boton-icono').value = a.boton_icono || '';
+    $id('an-publicar-desde').value = a.publicar_desde ? a.publicar_desde.slice(0, 16) : '';
     $id('an-vence').value = a.vence_en ? a.vence_en.slice(0, 16) : '';
     $id('an-activo').checked = a.activo !== false;
     $id('an-fijado').checked = !!a.fijado;
@@ -894,6 +981,8 @@ function mostrarFormAnuncio(id) {
     $id('an-destinatario').value = 'todos';
     $id('an-boton-texto').value = '';
     $id('an-boton-url').value = '';
+    $id('an-boton-icono').value = '';
+    $id('an-publicar-desde').value = '';
     $id('an-vence').value = '';
     $id('an-activo').checked = true;
     $id('an-fijado').checked = false;
@@ -902,6 +991,9 @@ function mostrarFormAnuncio(id) {
   }
 
   $id('form-anuncio-msg').textContent = '';
+  previewVisible = false;
+  const pw = $id('preview-anuncio-wrap');
+  if (pw) pw.style.display = 'none';
   const form = $id('form-anuncio');
   form.classList.add('visible');
   form.scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -910,6 +1002,7 @@ function mostrarFormAnuncio(id) {
 function ocultarFormAnuncio() {
   $id('form-anuncio').classList.remove('visible');
   anuncioEditando = null;
+  previewVisible = false;
 }
 
 async function guardarAnuncio() {
@@ -930,6 +1023,8 @@ async function guardarAnuncio() {
     return;
   }
 
+  const publicarDesde = ($id('an-publicar-desde').value || '').trim();
+
   const payload = {
     titulo,
     mensaje,
@@ -937,6 +1032,8 @@ async function guardarAnuncio() {
     destinatario: $id('an-destinatario').value || 'todos',
     boton_texto: ($id('an-boton-texto').value || '').trim() || null,
     boton_url: botonUrl || null,
+    boton_icono: $id('an-boton-icono').value || null,
+    publicar_desde: publicarDesde || null,
     activo: $id('an-activo').checked,
     fijado: $id('an-fijado').checked,
     vence_en: $id('an-vence').value || null,
@@ -988,17 +1085,30 @@ async function cargarAnunciosAdmin() {
   try {
     const { data, error } = await conTimeout(
       supabaseClient.from('anuncios')
-        .select('id,titulo,mensaje,tipo,destinatario,boton_texto,boton_url,activo,fijado,publicado_en,vence_en,archivado_en')
-        .order('publicado_en', {ascending: false}),
+        .select('id,titulo,mensaje,tipo,destinatario,boton_texto,boton_url,boton_icono,publicar_desde,activo,fijado,publicado_en,vence_en,archivado_en')
+        .order('publicado_en', {ascending: false})
+        .limit(200),
       'cargar anuncios admin'
     );
     if (error) throw error;
     todosLosAnuncios = Array.isArray(data) ? data : [];
+    actualizarStatsAnuncios();
     renderizarAnuncios();
   } catch (err) {
     statusEl.className = 'status status-error';
     statusEl.textContent = 'Error cargando anuncios: ' + detalleError(err);
   }
+}
+
+function actualizarStatsAnuncios() {
+  const a = todosLosAnuncios;
+  const ahora = new Date();
+  $id('ast-total').textContent = a.length;
+  $id('ast-activos').textContent = a.filter(x => x.activo && !x.archivado_en && (!x.publicar_desde || new Date(x.publicar_desde) <= ahora)).length;
+  $id('ast-urgentes').textContent = a.filter(x => x.tipo === 'urgente' && !x.archivado_en).length;
+  $id('ast-programados').textContent = a.filter(x => x.publicar_desde && new Date(x.publicar_desde) > ahora && !x.archivado_en).length;
+  $id('ast-fijados').textContent = a.filter(x => x.fijado && !x.archivado_en).length;
+  $id('ast-archivados').textContent = a.filter(x => !!x.archivado_en).length;
 }
 
 function filtrarAnuncios() {
@@ -1018,9 +1128,11 @@ function renderizarAnuncios() {
   const statusEl = $id('status-anuncios');
   listaEl.innerHTML = '';
 
+  const ahora = new Date();
   let visible = todosLosAnuncios;
-  if (filtroAnuncios === 'activos') visible = visible.filter(a => a.activo && !a.archivado_en);
+  if (filtroAnuncios === 'activos') visible = visible.filter(a => a.activo && !a.archivado_en && (!a.publicar_desde || new Date(a.publicar_desde) <= ahora));
   else if (filtroAnuncios === 'inactivos') visible = visible.filter(a => !a.activo && !a.archivado_en);
+  else if (filtroAnuncios === 'programados') visible = visible.filter(a => a.publicar_desde && new Date(a.publicar_desde) > ahora && !a.archivado_en);
   else if (filtroAnuncios === 'archivados') visible = visible.filter(a => !!a.archivado_en);
 
   if (busquedaAnuncios) {
@@ -1047,12 +1159,17 @@ function renderizarAnuncios() {
     const tipoSafe = ['urgente','importante','info','novedad'].includes(tipo) ? tipo : 'info';
     const venceStr = a.vence_en ? `Vence: ${fechaLinda(a.vence_en)}` : '';
     const fijadoStr = a.fijado ? ' 📌' : '';
+    const isProgramado = a.publicar_desde && new Date(a.publicar_desde) > ahora && !isArchivado;
     const estadoBadge = isArchivado
       ? '<span class="tag tag-archivado">Archivado</span>'
-      : (a.activo ? '<span class="tag tag-aprobado">Activo</span>' : '<span class="tag tag-pendiente">Inactivo</span>');
+      : isProgramado
+        ? `<span class="tag tag-programado">Programado<br><small>${fechaLinda(a.publicar_desde)}</small></span>`
+        : (a.activo ? '<span class="tag tag-aprobado">Activo</span>' : '<span class="tag tag-pendiente">Inactivo</span>');
+
+    const iconoLabel = a.boton_icono ? ` (${(ICONO_PREFIJOS_A[a.boton_icono]||'').trim()})` : '';
 
     const card = document.createElement('div');
-    card.className = 'card' + (isArchivado || !a.activo ? ' card-anuncio-dim' : '');
+    card.className = 'card' + (isArchivado || (!a.activo && !isProgramado) ? ' card-anuncio-dim' : '');
     card.dataset.anuncioId = String(a.id);
     card.innerHTML = `
       <div class="card-top">
@@ -1061,7 +1178,9 @@ function renderizarAnuncios() {
           <div class="muted">Tipo: <strong><span class="tag tag-${tipoSafe}" style="font-size:11px;padding:3px 8px">${escapeHtml(TIPO_LABELS_A[tipo] || tipo)}</span></strong></div>
           <div class="muted">Para: <strong>${escapeHtml(DEST_LABELS_A[a.destinatario] || a.destinatario)}</strong></div>
           <div class="muted">Publicado: ${fechaLinda(a.publicado_en)}</div>
+          ${a.publicar_desde ? `<div class="muted">⏰ Visible desde: ${fechaLinda(a.publicar_desde)}</div>` : ''}
           ${venceStr ? `<div class="muted">${escapeHtml(venceStr)}</div>` : ''}
+          ${a.boton_texto ? `<div class="muted">Botón: <strong>${escapeHtml(a.boton_texto)}${escapeHtml(iconoLabel)}</strong></div>` : ''}
           <details class="details" style="margin-top:6px">
             <summary>Ver mensaje</summary>
             <code style="white-space:pre-line">${escapeHtml(a.mensaje)}</code>

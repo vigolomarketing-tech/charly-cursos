@@ -105,6 +105,23 @@
     .modal p{margin:0 0 20px;color:rgba(255,255,255,.72);line-height:1.55;font-size:15px}
     .modal-actions{display:flex;gap:10px;justify-content:flex-end}
 
+    /* ANUNCIOS ADMIN */
+    .tag-urgente{color:#fca5a5;border-color:rgba(252,165,165,.35);background:rgba(252,165,165,.12)}
+    .tag-importante{color:#fdba74;border-color:rgba(253,186,116,.35);background:rgba(253,186,116,.10)}
+    .tag-info{color:#8be9ff;border-color:rgba(139,233,255,.30);background:rgba(139,233,255,.08)}
+    .tag-novedad{color:#86efac;border-color:rgba(134,239,172,.30);background:rgba(134,239,172,.08)}
+    .form-anuncio{display:none;flex-direction:column;gap:10px;padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;margin-bottom:14px}
+    .form-anuncio.visible{display:flex}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .form-field{display:flex;flex-direction:column;gap:4px}
+    .form-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.4px}
+    .form-anuncio input:not([type=checkbox]),.form-anuncio textarea,.form-anuncio select{padding:10px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:white;font-family:inherit;font-size:14px;width:100%}
+    .form-anuncio textarea{min-height:80px;resize:vertical}
+    .form-anuncio select option{background:#0e1117;color:white}
+    .checkbox-row{display:inline-flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;user-select:none}
+    .checkbox-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:#60d6ff;flex-shrink:0}
+    .card-anuncio-dim{opacity:.5}
+
     /* MOBILE */
     @media(max-width:900px){
       .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -130,6 +147,7 @@
       .toast{max-width:unset}
       .modal-actions{flex-direction:column-reverse}
       .modal-actions .btn{width:100%;min-height:42px}
+      .form-row{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -216,7 +234,7 @@
   </div>
 
   <!-- DELIVERIES -->
-  <div class="panel">
+  <div class="panel" id="panel-entregas">
     <div class="controls">
       <input class="search-input" id="search-input" type="text"
              placeholder="Buscar por nombre, email o curso..."
@@ -231,6 +249,92 @@
     </div>
     <div id="status" class="status">Cargando entregas...</div>
     <div id="lista" class="grid"></div>
+  </div>
+
+  <!-- GESTIONAR ANUNCIOS -->
+  <div class="panel" id="panel-anuncios" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div class="panel-title" style="margin:0">📢 Gestionar anuncios</div>
+      <button class="btn btn-primary" onclick="mostrarFormAnuncio(null)">+ Nuevo anuncio</button>
+    </div>
+
+    <!-- CREATE / EDIT FORM -->
+    <div class="form-anuncio" id="form-anuncio">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <strong id="form-anuncio-titulo">Nuevo anuncio</strong>
+        <button class="btn" onclick="ocultarFormAnuncio()" style="padding:6px 12px;font-size:13px">✕ Cancelar</button>
+      </div>
+      <div class="form-field">
+        <span class="form-label">Título *</span>
+        <input id="an-titulo" type="text" placeholder="Título del anuncio" maxlength="120" />
+      </div>
+      <div class="form-field">
+        <span class="form-label">Mensaje *</span>
+        <textarea id="an-mensaje" placeholder="Escribí el mensaje completo..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <span class="form-label">Tipo</span>
+          <select id="an-tipo">
+            <option value="info">🔵 Información</option>
+            <option value="importante">🟡 Importante</option>
+            <option value="urgente">🔴 Urgente</option>
+            <option value="novedad">🟢 Novedad</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <span class="form-label">Destinatario</span>
+          <select id="an-destinatario">
+            <option value="todos">Todos los alumnos</option>
+            <option value="pack_completo">Pack Completo</option>
+            <option value="personal">Personal Trainer</option>
+            <option value="nutricion">Nutrición</option>
+            <option value="hiit">Funcional &amp; HIIT</option>
+            <option value="musculacion">Musculación</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <span class="form-label">Texto del botón (opcional)</span>
+          <input id="an-boton-texto" type="text" placeholder="Ej: Unirse al Zoom" maxlength="60" />
+        </div>
+        <div class="form-field">
+          <span class="form-label">URL del botón (opcional)</span>
+          <input id="an-boton-url" type="url" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <span class="form-label">Vence el (opcional)</span>
+          <input id="an-vence" type="datetime-local" />
+        </div>
+        <div class="form-field" style="flex-direction:row;align-items:flex-end;gap:18px;flex-wrap:wrap">
+          <label class="checkbox-row"><input type="checkbox" id="an-activo" checked /> Activo</label>
+          <label class="checkbox-row"><input type="checkbox" id="an-fijado" /> Fijar</label>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary" id="btn-guardar-anuncio" onclick="guardarAnuncio()">Publicar anuncio</button>
+        <button class="btn" onclick="ocultarFormAnuncio()">Cancelar</button>
+        <span id="form-anuncio-msg" style="font-size:13px;min-height:18px"></span>
+      </div>
+    </div>
+
+    <!-- FILTER + SEARCH -->
+    <div class="controls" style="margin-top:4px">
+      <input class="search-input" id="search-anuncios" type="text"
+             placeholder="Buscar por título o mensaje..." oninput="filtrarAnuncios()" />
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-af="todos" onclick="cambiarFiltroAnuncios(this)">Todos</button>
+        <button class="filter-tab" data-af="activos" onclick="cambiarFiltroAnuncios(this)">Activos</button>
+        <button class="filter-tab" data-af="inactivos" onclick="cambiarFiltroAnuncios(this)">Inactivos</button>
+        <button class="filter-tab" data-af="archivados" onclick="cambiarFiltroAnuncios(this)">Archivados</button>
+      </div>
+    </div>
+
+    <div id="status-anuncios" class="status" style="margin-top:8px">Cargando anuncios...</div>
+    <div id="lista-anuncios" class="grid" style="margin-top:10px"></div>
   </div>
 
 </div>
@@ -438,7 +542,9 @@ function renderizarEntregas() {
 
   let visible = todasLasEntregas;
 
-  if (filtroActual !== "todos") {
+  if (filtroActual === "todos") {
+    visible = visible.filter(e => e.estado !== "archivado");
+  } else {
     visible = visible.filter(e => {
       const s = etiquetaEstado(e.estado);
       return s === filtroActual || e.estado === filtroActual;
@@ -753,9 +859,334 @@ async function revocarAcceso(email, plan) {
   }
 }
 
+/* ——— ANUNCIOS ——— */
+let todosLosAnuncios = [];
+let anuncioEditando = null;
+let filtroAnuncios = "todos";
+let busquedaAnuncios = "";
+
+const TIPO_LABELS_A = {urgente:'Urgente', importante:'Importante', info:'Información', novedad:'Novedad'};
+const DEST_LABELS_A = {todos:'Todos', pack_completo:'Pack Completo', personal:'Personal Trainer', nutricion:'Nutrición', hiit:'Funcional & HIIT', musculacion:'Musculación'};
+
+function mostrarFormAnuncio(id) {
+  anuncioEditando = id || null;
+  const tituloEl = $id('form-anuncio-titulo');
+  const btnEl = $id('btn-guardar-anuncio');
+
+  if (id) {
+    const a = todosLosAnuncios.find(x => String(x.id) === String(id));
+    if (!a) return;
+    $id('an-titulo').value = a.titulo || '';
+    $id('an-mensaje').value = a.mensaje || '';
+    $id('an-tipo').value = a.tipo || 'info';
+    $id('an-destinatario').value = a.destinatario || 'todos';
+    $id('an-boton-texto').value = a.boton_texto || '';
+    $id('an-boton-url').value = a.boton_url || '';
+    $id('an-vence').value = a.vence_en ? a.vence_en.slice(0, 16) : '';
+    $id('an-activo').checked = a.activo !== false;
+    $id('an-fijado').checked = !!a.fijado;
+    tituloEl.textContent = 'Editar anuncio';
+    btnEl.textContent = 'Guardar cambios';
+  } else {
+    $id('an-titulo').value = '';
+    $id('an-mensaje').value = '';
+    $id('an-tipo').value = 'info';
+    $id('an-destinatario').value = 'todos';
+    $id('an-boton-texto').value = '';
+    $id('an-boton-url').value = '';
+    $id('an-vence').value = '';
+    $id('an-activo').checked = true;
+    $id('an-fijado').checked = false;
+    tituloEl.textContent = 'Nuevo anuncio';
+    btnEl.textContent = 'Publicar anuncio';
+  }
+
+  $id('form-anuncio-msg').textContent = '';
+  const form = $id('form-anuncio');
+  form.classList.add('visible');
+  form.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function ocultarFormAnuncio() {
+  $id('form-anuncio').classList.remove('visible');
+  anuncioEditando = null;
+}
+
+async function guardarAnuncio() {
+  if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+
+  const titulo = ($id('an-titulo').value || '').trim();
+  const mensaje = ($id('an-mensaje').value || '').trim();
+  const msgEl = $id('form-anuncio-msg');
+  const btn = $id('btn-guardar-anuncio');
+
+  if (!titulo) { msgEl.style.color = '#fca5a5'; msgEl.textContent = 'El título es obligatorio.'; return; }
+  if (!mensaje) { msgEl.style.color = '#fca5a5'; msgEl.textContent = 'El mensaje es obligatorio.'; return; }
+
+  const botonUrl = ($id('an-boton-url').value || '').trim();
+  if (botonUrl && !botonUrl.match(/^https?:\/\//)) {
+    msgEl.style.color = '#fca5a5';
+    msgEl.textContent = 'La URL del botón debe comenzar con https://';
+    return;
+  }
+
+  const payload = {
+    titulo,
+    mensaje,
+    tipo: $id('an-tipo').value || 'info',
+    destinatario: $id('an-destinatario').value || 'todos',
+    boton_texto: ($id('an-boton-texto').value || '').trim() || null,
+    boton_url: botonUrl || null,
+    activo: $id('an-activo').checked,
+    fijado: $id('an-fijado').checked,
+    vence_en: $id('an-vence').value || null,
+    creado_por: ADMIN_EMAIL,
+    actualizado_en: new Date().toISOString(),
+  };
+
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+  msgEl.style.color = 'rgba(255,255,255,.55)';
+  msgEl.textContent = 'Guardando...';
+
+  try {
+    if (anuncioEditando) {
+      const { error } = await conTimeout(
+        supabaseClient.from('anuncios').update(payload).eq('id', anuncioEditando),
+        'editar anuncio'
+      );
+      if (error) throw error;
+      toast('Anuncio actualizado');
+    } else {
+      const { error } = await conTimeout(
+        supabaseClient.from('anuncios').insert(payload),
+        'crear anuncio'
+      );
+      if (error) throw error;
+      toast('Anuncio publicado');
+    }
+    ocultarFormAnuncio();
+    await cargarAnunciosAdmin();
+  } catch (err) {
+    msgEl.style.color = '#fca5a5';
+    msgEl.textContent = 'Error: ' + detalleError(err);
+    toast('Error guardando anuncio: ' + detalleError(err), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = anuncioEditando ? 'Guardar cambios' : 'Publicar anuncio';
+  }
+}
+
+async function cargarAnunciosAdmin() {
+  const statusEl = $id('status-anuncios');
+  const listaEl = $id('lista-anuncios');
+  if (!statusEl || !listaEl) return;
+  statusEl.className = 'status';
+  statusEl.textContent = 'Cargando anuncios...';
+  listaEl.innerHTML = '';
+
+  try {
+    const { data, error } = await conTimeout(
+      supabaseClient.from('anuncios')
+        .select('id,titulo,mensaje,tipo,destinatario,boton_texto,boton_url,activo,fijado,publicado_en,vence_en,archivado_en')
+        .order('publicado_en', {ascending: false}),
+      'cargar anuncios admin'
+    );
+    if (error) throw error;
+    todosLosAnuncios = Array.isArray(data) ? data : [];
+    renderizarAnuncios();
+  } catch (err) {
+    statusEl.className = 'status status-error';
+    statusEl.textContent = 'Error cargando anuncios: ' + detalleError(err);
+  }
+}
+
+function filtrarAnuncios() {
+  busquedaAnuncios = ($id('search-anuncios')?.value || '').toLowerCase().trim();
+  renderizarAnuncios();
+}
+
+function cambiarFiltroAnuncios(btn) {
+  document.querySelectorAll('[data-af]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtroAnuncios = btn.dataset.af;
+  renderizarAnuncios();
+}
+
+function renderizarAnuncios() {
+  const listaEl = $id('lista-anuncios');
+  const statusEl = $id('status-anuncios');
+  listaEl.innerHTML = '';
+
+  let visible = todosLosAnuncios;
+  if (filtroAnuncios === 'activos') visible = visible.filter(a => a.activo && !a.archivado_en);
+  else if (filtroAnuncios === 'inactivos') visible = visible.filter(a => !a.activo && !a.archivado_en);
+  else if (filtroAnuncios === 'archivados') visible = visible.filter(a => !!a.archivado_en);
+
+  if (busquedaAnuncios) {
+    visible = visible.filter(a =>
+      (a.titulo || '').toLowerCase().includes(busquedaAnuncios) ||
+      (a.mensaje || '').toLowerCase().includes(busquedaAnuncios)
+    );
+  }
+
+  if (visible.length === 0) {
+    statusEl.className = 'status';
+    statusEl.textContent = todosLosAnuncios.length === 0
+      ? 'No hay anuncios publicados aún.'
+      : 'Sin resultados para los filtros aplicados.';
+    return;
+  }
+
+  statusEl.className = 'status status-ok';
+  statusEl.textContent = `${visible.length} anuncio${visible.length !== 1 ? 's' : ''}.`;
+
+  visible.forEach(a => {
+    const isArchivado = !!a.archivado_en;
+    const tipo = a.tipo || 'info';
+    const tipoSafe = ['urgente','importante','info','novedad'].includes(tipo) ? tipo : 'info';
+    const venceStr = a.vence_en ? `Vence: ${fechaLinda(a.vence_en)}` : '';
+    const fijadoStr = a.fijado ? ' 📌' : '';
+    const estadoBadge = isArchivado
+      ? '<span class="tag tag-archivado">Archivado</span>'
+      : (a.activo ? '<span class="tag tag-aprobado">Activo</span>' : '<span class="tag tag-pendiente">Inactivo</span>');
+
+    const card = document.createElement('div');
+    card.className = 'card' + (isArchivado || !a.activo ? ' card-anuncio-dim' : '');
+    card.dataset.anuncioId = String(a.id);
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="meta">
+          <h3>${escapeHtml(a.titulo)}${fijadoStr}</h3>
+          <div class="muted">Tipo: <strong><span class="tag tag-${tipoSafe}" style="font-size:11px;padding:3px 8px">${escapeHtml(TIPO_LABELS_A[tipo] || tipo)}</span></strong></div>
+          <div class="muted">Para: <strong>${escapeHtml(DEST_LABELS_A[a.destinatario] || a.destinatario)}</strong></div>
+          <div class="muted">Publicado: ${fechaLinda(a.publicado_en)}</div>
+          ${venceStr ? `<div class="muted">${escapeHtml(venceStr)}</div>` : ''}
+          <details class="details" style="margin-top:6px">
+            <summary>Ver mensaje</summary>
+            <code style="white-space:pre-line">${escapeHtml(a.mensaje)}</code>
+          </details>
+        </div>
+        ${estadoBadge}
+      </div>
+      <div class="actions" data-role="acciones-anuncio">
+        ${!isArchivado ? `<button class="btn" onclick="mostrarFormAnuncio('${escapeHtml(String(a.id))}')">Editar</button>` : ''}
+        ${!isArchivado ? `<button class="btn" onclick="toggleActivoAnuncio('${escapeHtml(String(a.id))}', ${!a.activo})">${a.activo ? 'Desactivar' : 'Activar'}</button>` : ''}
+        ${!isArchivado ? `<button class="btn" onclick="toggleFijadoAnuncio('${escapeHtml(String(a.id))}', ${!a.fijado})">${a.fijado ? 'Desfijar' : 'Fijar'}</button>` : ''}
+        ${!isArchivado
+          ? `<button class="btn btn-archive" onclick="confirmarArchivarAnuncio('${escapeHtml(String(a.id))}')">Archivar</button>`
+          : `<button class="btn btn-restore" onclick="restaurarAnuncio('${escapeHtml(String(a.id))}')">Restaurar</button>`}
+        <button class="btn btn-bad" onclick="confirmarEliminarAnuncio('${escapeHtml(String(a.id))}')">Eliminar</button>
+      </div>`;
+    listaEl.appendChild(card);
+  });
+}
+
+function confirmarArchivarAnuncio(id) {
+  mostrarModal(
+    'Archivar anuncio',
+    'El anuncio dejará de ser visible para los alumnos. Podés restaurarlo luego.',
+    'btn-archive', 'Archivar',
+    () => archivarAnuncio(id)
+  );
+}
+
+async function archivarAnuncio(id) {
+  if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from('anuncios').update({archivado_en: new Date().toISOString(), activo: false}).eq('id', id),
+      'archivar anuncio'
+    );
+    if (error) throw error;
+    const idx = todosLosAnuncios.findIndex(a => String(a.id) === String(id));
+    if (idx >= 0) { todosLosAnuncios[idx].archivado_en = new Date().toISOString(); todosLosAnuncios[idx].activo = false; }
+    renderizarAnuncios();
+    toast('Anuncio archivado');
+  } catch (err) {
+    toast('Error archivando anuncio: ' + detalleError(err), 'error');
+  }
+}
+
+async function restaurarAnuncio(id) {
+  if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from('anuncios').update({archivado_en: null, activo: true}).eq('id', id),
+      'restaurar anuncio'
+    );
+    if (error) throw error;
+    const idx = todosLosAnuncios.findIndex(a => String(a.id) === String(id));
+    if (idx >= 0) { todosLosAnuncios[idx].archivado_en = null; todosLosAnuncios[idx].activo = true; }
+    renderizarAnuncios();
+    toast('Anuncio restaurado y activado');
+  } catch (err) {
+    toast('Error restaurando anuncio: ' + detalleError(err), 'error');
+  }
+}
+
+async function toggleActivoAnuncio(id, nuevoActivo) {
+  if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from('anuncios').update({activo: nuevoActivo}).eq('id', id),
+      'toggle activo anuncio'
+    );
+    if (error) throw error;
+    const idx = todosLosAnuncios.findIndex(a => String(a.id) === String(id));
+    if (idx >= 0) todosLosAnuncios[idx].activo = nuevoActivo;
+    renderizarAnuncios();
+    toast(nuevoActivo ? 'Anuncio activado' : 'Anuncio desactivado');
+  } catch (err) {
+    toast('Error: ' + detalleError(err), 'error');
+  }
+}
+
+async function toggleFijadoAnuncio(id, nuevoFijado) {
+  if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from('anuncios').update({fijado: nuevoFijado}).eq('id', id),
+      'toggle fijado anuncio'
+    );
+    if (error) throw error;
+    const idx = todosLosAnuncios.findIndex(a => String(a.id) === String(id));
+    if (idx >= 0) todosLosAnuncios[idx].fijado = nuevoFijado;
+    renderizarAnuncios();
+    toast(nuevoFijado ? 'Anuncio fijado 📌' : 'Anuncio desfijado');
+  } catch (err) {
+    toast('Error: ' + detalleError(err), 'error');
+  }
+}
+
+function confirmarEliminarAnuncio(id) {
+  mostrarModal(
+    'Eliminar anuncio',
+    'Esta acción eliminará el anuncio definitivamente. No se puede deshacer.',
+    'btn-bad', 'Eliminar definitivamente',
+    () => eliminarAnuncio(id)
+  );
+}
+
+async function eliminarAnuncio(id) {
+  if (!adminValidado) { const ok = await protegerAdmin(); if (!ok) return; }
+  try {
+    const { error } = await conTimeout(
+      supabaseClient.from('anuncios').delete().eq('id', id),
+      'eliminar anuncio'
+    );
+    if (error) throw error;
+    todosLosAnuncios = todosLosAnuncios.filter(a => String(a.id) !== String(id));
+    renderizarAnuncios();
+    toast('Anuncio eliminado');
+  } catch (err) {
+    toast('Error eliminando anuncio: ' + detalleError(err), 'error');
+  }
+}
+
 /* ——— INIT ——— */
 async function cargarTodo() {
-  await Promise.all([cargarEntregas(), cargarStats()]);
+  await Promise.all([cargarEntregas(), cargarStats(), cargarAnunciosAdmin()]);
 }
 
 async function iniciarAdmin() {
